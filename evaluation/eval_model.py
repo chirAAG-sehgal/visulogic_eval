@@ -20,8 +20,10 @@ class ModelEvaluator:
         self.verbose = getattr(args, 'verbose', False)
         self.api_key = getattr(args, 'api_key', '')
         self.base_url = getattr(args, 'base_url', '')
-        self.judge_model_name = getattr(args, 'judge_model_name', 'gpt-4-mini')
-        self.judge_client = OpenAI(api_key=self.judege_api_key, base_url=self.judge_base_url) if self.api_key else None
+        self.judge_model_name = getattr(args, 'judge_model_name', 'gpt-4o-mini')
+        self.judge_api_key = getattr(args, 'judge_api_key', '')
+        self.judge_base_url = getattr(args, 'judge_base_url', 'https://api.openai.com/v1')
+        self.judge_client = OpenAI(api_key=self.judge_api_key, base_url=self.judge_base_url) if self.judge_api_key else None
         
         # Define tag order
         self.tag_order = [
@@ -122,11 +124,16 @@ class ModelEvaluator:
     def extract_answer_v1(self, ans):
         if self.extract_last_boxed_content(ans).strip() in Option_list:
             return self.extract_last_boxed_content(ans).strip(), "box"
+        elif self.extract_answer_tag_content(ans).strip() in Option_list:
+            return self.extract_answer_tag_content(ans).strip(), "tag"
         elif self.extract_lang_content(ans) in Option_list:
             return self.extract_lang_content(ans), "lang"
-        else:
+        elif self.judge_client:
             print("Rule extraction failed. The current answer is: ", ans)
             return self.extract_gpt(ans), "gpt"
+        else:
+            print("Rule extraction failed (no judge). The current answer is: ", ans)
+            return self.extract_lang_content(ans), "lang_fallback"
 
     def load_data(self):
         """Load jsonl data"""
@@ -203,7 +210,7 @@ class ModelEvaluator:
         scores_str = " & ".join([str(f'{tag_scores[tag]:.1f}') for tag in self.tag_order])
         excel_scores_str = ";".join([str(f'{tag_scores[tag]:.1f}') for tag in self.tag_order])
         
-        model_name = self.get_model_name()
+        model_name = self.model.name
         latex_output = f"{model_name} & {overall_acc:.1f} & {scores_str} \\\\"
         excel_output = f"{overall_acc:.1f};{excel_scores_str}"
         
@@ -227,6 +234,12 @@ def main():
     args = parser.parse_args()
 
     if args.user_prompt == '': # default
+        args.user_prompt = SFT_PROMPT
+    elif args.user_prompt == 'cot':
+        args.user_prompt = COT_PROMPT
+    elif args.user_prompt == 'rl_cot':
+        args.user_prompt = RL_COT_PROMPT
+    elif args.user_prompt == 'sft':
         args.user_prompt = SFT_PROMPT
     
     evaluator = ModelEvaluator(args)

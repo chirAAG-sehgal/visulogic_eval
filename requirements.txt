@@ -1,11 +1,11 @@
 --extra-index-url https://download.pytorch.org/whl/cu121
-torch==2.5.1
-torchvision==0.20.1
-torchaudio==2.5.1
-openai==1.65.1
+torch==2.6.0
+torchvision
+torchaudio
+openai
 Pillow
-qwen_vl_utils==0.0.10
+qwen_vl_utils
 tqdm
-transformers==4.49.0
+transformers
 modelscope
 git+https://github.com/LLaVA-VL/LLaVA-NeXT.git
