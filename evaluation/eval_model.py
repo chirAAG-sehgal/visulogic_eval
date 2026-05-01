@@ -1,9 +1,17 @@
 import sys
 sys.path.append(".")
 import argparse
+import os
+
+# Parse --gpu_ids early so CUDA_VISIBLE_DEVICES is set before torch is imported
+_parser = argparse.ArgumentParser(add_help=False)
+_parser.add_argument('--gpu_ids', type=str, default=None)
+_early_args, _ = _parser.parse_known_args()
+if _early_args.gpu_ids is not None:
+    os.environ["CUDA_VISIBLE_DEVICES"] = _early_args.gpu_ids
+
 import json
 import statistics
-import os
 import re
 import time
 from openai import OpenAI

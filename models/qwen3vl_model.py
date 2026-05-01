@@ -20,10 +20,6 @@ class Qwen3VisionModel(BaseModel):
         self.max_image_size = max_image_size
         self.is_thinking = "thinking" in model_path.lower()
 
-        if gpu_ids is not None:
-            import os
-            os.environ["CUDA_VISIBLE_DEVICES"] = gpu_ids
-
         device_map = "auto"
         dtype = "auto"
 
