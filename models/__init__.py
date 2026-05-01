@@ -17,7 +17,8 @@ def load_model(args):
     elif 'qwen3' in args.model_path.lower() and 'vl' in args.model_path.lower():
         from models.qwen3vl_model import Qwen3VisionModel
         model = Qwen3VisionModel(model_path = args.model_path,
-                                user_prompt = args.user_prompt)
+                                user_prompt = args.user_prompt,
+                                gpu_ids = getattr(args, 'gpu_ids', None))
     elif 'qwen' in args.model_path.lower() and 'vl' in args.model_path.lower():
         from models.qwenvl_model import QwenVisionModel
         model = QwenVisionModel(model_path = args.model_path,

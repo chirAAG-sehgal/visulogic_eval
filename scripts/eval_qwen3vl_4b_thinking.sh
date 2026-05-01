@@ -3,4 +3,6 @@ python evaluation/eval_model.py \
     --input_file data/visulogic_benchmark/data.jsonl \
     --output_file outputs/qwen3_vl_4b_thinking.jsonl \
     --model_path weights/Qwen_Qwen3-VL-4B-Thinking \
-    --user_prompt "rl_cot"
+    --user_prompt "rl_cot" \
+    --batch_size ${BATCH_SIZE:-4} \
+    --gpu_ids ${GPU_IDS:-"3"}

@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 import torch
 from transformers import Qwen3VLForConditionalGeneration, AutoProcessor
 from PIL import Image
@@ -6,18 +6,23 @@ from models.base_model import BaseModel
 
 
 class Qwen3VisionModel(BaseModel):
-    def __init__(self, model_path: str, user_prompt: str = None, max_image_size: int = -1):
+    def __init__(self, model_path: str, user_prompt: str = None, max_image_size: int = -1, gpu_ids: str = None):
         """
         Initialize the Qwen3 Vision Model.
         Args:
             model_path: HuggingFace model path (e.g., Qwen/Qwen3-VL-2B-Instruct).
             user_prompt: Prompt template to append to questions.
             max_image_size: Max image dimension (-1 for no resize).
+            gpu_ids: Comma-separated GPU ids (e.g. "0,1"). If None, uses all available.
         """
         self.model_path = model_path
         self.user_prompt = user_prompt
         self.max_image_size = max_image_size
         self.is_thinking = "thinking" in model_path.lower()
+
+        if gpu_ids is not None:
+            import os
+            os.environ["CUDA_VISIBLE_DEVICES"] = gpu_ids
 
         device_map = "auto"
         dtype = "auto"
@@ -28,6 +33,7 @@ class Qwen3VisionModel(BaseModel):
             device_map=device_map,
         )
         self.processor = AutoProcessor.from_pretrained(model_path)
+        self.processor.tokenizer.padding_side = "left"
 
     @property
     def name(self) -> str:
@@ -76,3 +82,44 @@ class Qwen3VisionModel(BaseModel):
         )
 
         return output_text[0] if output_text else ""
+
+    def predict_batch(self, input_data_list: List[Dict]) -> List[str]:
+        """Process a batch of inputs at once for higher GPU utilization."""
+        batch_messages = []
+        for input_data in input_data_list:
+            image = Image.open(input_data["image_path"]).convert("RGB")
+            text = input_data["text"] + self.user_prompt
+            messages = [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "image", "image": image},
+                        {"type": "text", "text": text},
+                    ],
+                }
+            ]
+            batch_messages.append(messages)
+
+        batch_inputs = self.processor.apply_chat_template(
+            batch_messages,
+            tokenize=True,
+            add_generation_prompt=True,
+            return_dict=True,
+            return_tensors="pt",
+            padding=True,
+        )
+        batch_inputs = batch_inputs.to(self.model.device)
+
+        generated_ids = self.model.generate(**batch_inputs, max_new_tokens=8192)
+
+        # Trim input tokens from each output
+        input_lengths = batch_inputs.input_ids.shape[1]
+        generated_ids_trimmed = generated_ids[:, input_lengths:]
+
+        output_texts = self.processor.batch_decode(
+            generated_ids_trimmed,
+            skip_special_tokens=True,
+            clean_up_tokenization_spaces=False,
+        )
+
+        return output_texts

@@ -17,6 +17,7 @@ class ModelEvaluator:
         self.model = load_model(args)
         self.input_file = args.input_file
         self.output_file = args.output_file
+        self.batch_size = getattr(args, 'batch_size', 1)
         self.verbose = getattr(args, 'verbose', False)
         self.api_key = getattr(args, 'api_key', '')
         self.base_url = getattr(args, 'base_url', '')
@@ -179,29 +180,53 @@ class ModelEvaluator:
         """Main evaluation function"""
         eval_data = self.load_data()
         open(self.output_file, 'w').close()
-        
+
+        batch_size = getattr(self, 'batch_size', 1)
+        has_batch_predict = hasattr(self.model, 'predict_batch') and batch_size > 1
+
         eval_results = []
-        for item in tqdm(eval_data, desc="Evaluating"):
-            # Model inference
-            input_dict = {
-                "image_path": os.path.join(self.input_file.replace("data.jsonl",""),item['image_path']),
-                "text": item['question']
-            }
-            model_response = self.model.predict(input_dict)
-            
-            # Extract answer
-            extracted_answer, extractor = self.extract_answer_v1(model_response)
-            
-            # Construct output result
-            result = {
-                **item,
-                'model_response': model_response,
-                'extracted_answer': extracted_answer,
-                'extractor': extractor
-            }
-            
-            eval_results.append(result)
-            self.write_result(result)
+        if has_batch_predict:
+            # Batched inference
+            for i in tqdm(range(0, len(eval_data), batch_size), desc="Evaluating (batched)"):
+                batch_items = eval_data[i:i + batch_size]
+                input_dicts = [
+                    {
+                        "image_path": os.path.join(self.input_file.replace("data.jsonl",""), item['image_path']),
+                        "text": item['question']
+                    }
+                    for item in batch_items
+                ]
+                model_responses = self.model.predict_batch(input_dicts)
+
+                for item, model_response in zip(batch_items, model_responses):
+                    extracted_answer, extractor = self.extract_answer_v1(model_response)
+                    result = {
+                        **item,
+                        'model_response': model_response,
+                        'extracted_answer': extracted_answer,
+                        'extractor': extractor
+                    }
+                    eval_results.append(result)
+                    self.write_result(result)
+        else:
+            # Single-sample inference
+            for item in tqdm(eval_data, desc="Evaluating"):
+                input_dict = {
+                    "image_path": os.path.join(self.input_file.replace("data.jsonl",""),item['image_path']),
+                    "text": item['question']
+                }
+                model_response = self.model.predict(input_dict)
+
+                extracted_answer, extractor = self.extract_answer_v1(model_response)
+                result = {
+                    **item,
+                    'model_response': model_response,
+                    'extracted_answer': extracted_answer,
+                    'extractor': extractor
+                }
+
+                eval_results.append(result)
+                self.write_result(result)
 
         # Calculate and output scores
         tag_scores, overall_acc = self.calculate_scores(eval_results)
@@ -230,7 +255,9 @@ def main():
     parser.add_argument('--judge_base_url', type=str, default='https://api.openai.com/v1', help='Base URL')
     parser.add_argument('--user_prompt', type=str, default='', help='user prompt')
     parser.add_argument('--judge_model_name', type=str, default='gpt-4o-mini', help='Judge model name')
-    
+    parser.add_argument('--batch_size', type=int, default=1, help='Batch size for inference')
+    parser.add_argument('--gpu_ids', type=str, default=None, help='Comma-separated GPU ids (e.g. "0,1")')
+
     args = parser.parse_args()
 
     if args.user_prompt == '': # default
