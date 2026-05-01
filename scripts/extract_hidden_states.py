@@ -87,7 +87,7 @@ def main():
     processor = AutoProcessor.from_pretrained(args.model_path)
 
     # Load data
-    base_dir = args.input_file.replace("data.jsonl", "")
+    base_dir = os.path.dirname(args.input_file)
     data = load_data(args.input_file)
     print(f"Loaded {len(data)} samples. Saving to {output_dir}")
 
