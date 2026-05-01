@@ -47,7 +47,11 @@ def prepare_input(processor, image_path, text, user_prompt):
         return_dict=True,
         return_tensors="pt",
     )
-    return inputs
+
+    # Decode the full prompt text (with special tokens) for logging
+    prompt_text = processor.decode(inputs["input_ids"][0], skip_special_tokens=False)
+
+    return inputs, prompt_text
 
 
 def main():
@@ -87,17 +91,38 @@ def main():
     data = load_data(args.input_file)
     print(f"Loaded {len(data)} samples. Saving to {output_dir}")
 
-    for item in tqdm(data, desc="Extracting hidden states"):
+    # Prompts metadata file
+    prompts_dir = os.path.join(output_dir, "prompts")
+    os.makedirs(prompts_dir, exist_ok=True)
+
+    skipped = 0
+    pbar = tqdm(data, desc="Extracting hidden states", unit="sample",
+                bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}]")
+
+    for item in pbar:
         sample_id = item['id']
         out_path = os.path.join(output_dir, f"{sample_id}.pt")
+        prompt_path = os.path.join(prompts_dir, f"{sample_id}.json")
 
         # Skip if already extracted
         if os.path.exists(out_path):
+            skipped += 1
+            pbar.set_postfix(skipped=skipped)
             continue
 
         image_path = os.path.join(base_dir, item['image_path'])
-        inputs = prepare_input(processor, image_path, item['question'], user_prompt)
+        inputs, prompt_text = prepare_input(processor, image_path, item['question'], user_prompt)
         inputs = inputs.to(model.device)
+
+        # Save prompt metadata
+        prompt_meta = {
+            "id": sample_id,
+            "image_path": item['image_path'],
+            "prompt": prompt_text,
+            "seq_len": inputs["input_ids"].shape[1],
+        }
+        with open(prompt_path, 'w', encoding='utf-8') as f:
+            json.dump(prompt_meta, f, ensure_ascii=False, indent=2)
 
         with torch.no_grad():
             outputs = model(
@@ -112,7 +137,15 @@ def main():
 
         torch.save(final_hidden, out_path)
 
-    print(f"Done. Hidden states saved to {output_dir}")
+        pbar.set_postfix(
+            seq_len=inputs["input_ids"].shape[1],
+            hidden=list(final_hidden.shape),
+            skipped=skipped,
+        )
+
+    print(f"\nDone. Hidden states saved to {output_dir}")
+    print(f"Prompt metadata saved to {prompts_dir}")
+    print(f"Total: {len(data)}, Extracted: {len(data) - skipped}, Skipped: {skipped}")
 
 
 if __name__ == '__main__':
