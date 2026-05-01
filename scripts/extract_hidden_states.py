@@ -110,14 +110,15 @@ def main():
             pbar.set_postfix(skipped=skipped)
             continue
 
-        image_path = os.path.join(base_dir, item['image_path'])
+        image_name = f"{sample_id}.png"
+        image_path = os.path.join(base_dir, image_name)
         inputs, prompt_text = prepare_input(processor, image_path, item['question'], user_prompt)
         inputs = inputs.to(model.device)
 
         # Save prompt metadata
         prompt_meta = {
             "id": sample_id,
-            "image_path": item['image_path'],
+            "image": image_name,
             "prompt": prompt_text,
             "seq_len": inputs["input_ids"].shape[1],
         }
