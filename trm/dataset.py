@@ -21,14 +21,19 @@ class HiddenStateDataset(Dataset):
         z = the last token (1, 1, D) — the generation prompt token
     """
 
-    def __init__(self, hidden_states_dir, labels_file, label_key='answer'):
+    def __init__(self, hidden_states_dir, labels_file, label_key='answer',
+                 max_seq_len=None, x_last_only=False):
         """
         Args:
             hidden_states_dir: Directory containing {id}.pt files
             labels_file: Path to jsonl file with labels
             label_key: Key for the answer in the jsonl ('answer' for train, 'label' for val)
+            max_seq_len: If set, truncate x to this length (keeps last max_seq_len-1 tokens
+                so the generation token z is preserved). None = no truncation.
         """
         self.hidden_states_dir = hidden_states_dir
+        self.max_seq_len = max_seq_len
+        self.x_last_only = x_last_only
 
         # Load labels
         self.samples = []
@@ -60,9 +65,17 @@ class HiddenStateDataset(Dataset):
         if hidden.dim() == 3:
             hidden = hidden.squeeze(0)  # (seq_len, D)
 
-        # Split: x = all except last, z = last token
-        x = hidden[:-1]   # (seq_len-1, D)
-        z = hidden[-1:]    # (1, D)
+        if self.x_last_only:
+            # Ablation: x is just the final (generation) token; z will be
+            # initialized from a learnable parameter inside the model.
+            x = hidden[-1:]   # (1, D)
+            z = hidden[-1:]   # placeholder; model overrides with z_init
+        else:
+            # Split: x = all except last, z = last token
+            x = hidden[:-1]   # (seq_len-1, D)
+            z = hidden[-1:]    # (1, D)
+            if self.max_seq_len is not None and x.shape[0] > self.max_seq_len:
+                x = x[-self.max_seq_len:]
 
         return {
             'x': x,

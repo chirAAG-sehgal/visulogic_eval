@@ -73,7 +73,7 @@ def main():
 
     # Resolve output dir
     model_name = os.path.basename(args.model_path)
-    output_dir = args.output_dir or os.path.join('outputs', 'hidden_states', model_name)
+    output_dir = args.output_dir or os.path.join('outputs', 'hidden_states/val', model_name)
     os.makedirs(output_dir, exist_ok=True)
 
     # Load model
@@ -111,7 +111,7 @@ def main():
             continue
 
         image_name = f"{sample_id}.png"
-        image_path = os.path.join(base_dir, image_name)
+        image_path = os.path.join(base_dir, "images/"+image_name)
         inputs, prompt_text = prepare_input(processor, image_path, item['question'], user_prompt)
         inputs = inputs.to(model.device)
 

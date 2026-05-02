@@ -1,0 +1,68 @@
+/opt/conda/lib/python3.13/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+2026/05/02 22:34:23 INFO mlflow.system_metrics.system_metrics_monitor: Started monitoring system metrics.
+Using device: cuda
+Mixed precision: True
+Loading datasets...
+Loaded 4296 samples from outputs/hidden_states/Qwen3-VL-4B-Instruct
+Loaded 1000 samples from outputs/hidden_states/val/Qwen3-VL-4B-Instruct
+Building TRM...
+TRM parameters: 131,102,720 (131.1M)
+Config: {'model_name': 'Qwen3-VL-4B-Instruct', 'train_hidden_dir': 'outputs/hidden_states/Qwen3-VL-4B-Instruct', 'val_hidden_dir': 'outputs/hidden_states/val/Qwen3-VL-4B-Instruct', 'train_labels': 'data/visulogic_train/visulogic_train_qwen.jsonl', 'val_labels': 'data/visulogic_benchmark/data.jsonl', 'train_label_key': 'answer', 'val_label_key': 'label', 'dim': 2560, 'n_heads': 20, 'n_layers': 2, 'mlp_ratio': 2, 'n_classes': 4, 'n_latent_steps': 6, 'n_deep_passes': 3, 'n_sup_steps': 8, 'batch_size': 1, 'grad_accum_steps': 16, 'epochs': 50, 'lr': 5e-05, 'lr_embed': 0.01, 'weight_decay': 0.01, 'warmup_ratio': 0.05, 'ema_decay': 0.999, 'patience': 10, 'gpu': 0, 'num_workers': 4, 'seed': 42, 'fp16': True, 'no_fp16': False, 'max_seq_len': None, 'log_dir': 'logs', 'ckpt_dir': 'checkpoints/trm', 'mlflow_experiment': 'TRM-VisuLogic', 'run_name': None, 'run_tag': '4b_mlp2_fullseq', 'iter_log_every': 20}
+TRM parameters: 131,102,720
+Train samples: 4296, Val samples: 1000
+Steps/epoch: 269, Total steps: 13450, Warmup: 672
+--- Epoch 1/50 ---
+Train:   0%|          | 0/4296 [00:00<?]Train:   0%|          | 0/4296 [00:01<?]Train:   0%|          | 1/4296 [00:01<1:23:03]Train:   0%|          | 1/4296 [00:01<1:23:03]Train:   0%|          | 2/4296 [00:01<1:03:17]Train:   0%|          | 2/4296 [00:02<1:03:17]Train:   0%|          | 3/4296 [00:02<50:18]  Train:   0%|          | 3/4296 [00:02<50:18]Train:   0%|          | 4/4296 [00:02<43:49]Train:   0%|          | 4/4296 [00:03<43:49]Train:   0%|          | 5/4296 [00:03<42:30]Train:   0%|          | 5/4296 [00:03<42:30]Train:   0%|          | 6/4296 [00:03<41:55]Train:   0%|          | 6/4296 [00:04<41:55]Train:   0%|          | 7/4296 [00:04<44:33]Train:   0%|          | 7/4296 [00:05<44:33]Train:   0%|          | 8/4296 [00:05<46:21]Train:   0%|          | 8/4296 [00:05<46:21]Train:   0%|          | 9/4296 [00:05<44:59]Train:   0%|          | 9/4296 [00:06<44:59]Train:   0%|          | 10/4296 [00:06<49:07]Train:   0%|          | 10/4296 [00:07<49:07]Train:   0%|          | 11/4296 [00:07<46:29]Train:   0%|          | 11/4296 [00:07<46:29]Train:   0%|          | 12/4296 [00:07<42:25]Train:   0%|          | 12/4296 [00:08<42:25]Train:   0%|          | 13/4296 [00:08<41:47]Train:   0%|          | 13/4296 [00:08<41:47]Train:   0%|          | 14/4296 [00:08<41:53]Train:   0%|          | 14/4296 [00:09<41:53]Train:   0%|          | 15/4296 [00:09<47:20]Train:   0%|          | 15/4296 [00:11<47:20]Train:   0%|          | 16/4296 [00:11<1:01:51]Train:   0%|          | 16/4296 [00:11<1:01:51]Train:   0%|          | 17/4296 [00:11<55:57]  Train:   0%|          | 17/4296 [00:12<55:57]Train:   0%|          | 18/4296 [00:12<51:11]Train:   0%|          | 18/4296 [00:12<51:11]Train:   0%|          | 19/4296 [00:12<48:33]Train:   0%|          | 19/4296 [00:13<48:33]Train:   0%|          | 20/4296 [00:13<46:51]Train:   0%|          | 20/4296 [00:13<46:51]Train:   0%|          | 21/4296 [00:13<43:00]Train:   0%|          | 21/4296 [00:14<43:00]Train:   1%|          | 22/4296 [00:14<47:11]Train:   1%|          | 22/4296 [00:15<47:11]Train:   1%|          | 23/4296 [00:15<47:49]Train:   1%|          | 23/4296 [00:16<47:49]Train:   1%|          | 24/4296 [00:16<45:33]Train:   1%|          | 24/4296 [00:16<45:33]Train:   1%|          | 25/4296 [00:16<44:16]Train:   1%|          | 25/4296 [00:17<44:16]Train:   1%|          | 26/4296 [00:17<51:47]Train:   1%|          | 26/4296 [00:18<51:47]Train:   1%|          | 27/4296 [00:18<50:54]Train:   1%|          | 27/4296 [00:18<50:54]Train:   1%|          | 28/4296 [00:18<50:27]Train:   1%|          | 28/4296 [00:19<50:27]Train:   1%|          | 29/4296 [00:19<48:03]Train:   1%|          | 29/4296 [00:20<48:03]Train:   1%|          | 30/4296 [00:20<43:37]Train:   1%|          | 30/4296 [00:20<43:37]Train:   1%|          | 31/4296 [00:20<40:45]Train:   1%|          | 31/4296 [00:21<40:45]Train:   1%|          | 32/4296 [00:21<41:37]Train:   1%|          | 32/4296 [00:21<41:37]Train:   1%|          | 33/4296 [00:21<41:24]Train:   1%|          | 33/4296 [00:22<41:24]Train:   1%|          | 34/4296 [00:22<41:44]Train:   1%|          | 34/4296 [00:22<41:44]Train:   1%|          | 35/4296 [00:22<41:27]Train:   1%|          | 35/4296 [00:23<41:27]Train:   1%|          | 36/4296 [00:23<49:36]Train:   1%|          | 36/4296 [00:24<49:36]Train:   1%|          | 37/4296 [00:24<47:34]Train:   1%|          | 37/4296 [00:25<47:34]Train:   1%|          | 38/4296 [00:25<48:03]Train:   1%|          | 38/4296 [00:25<48:03]Train:   1%|          | 39/4296 [00:25<43:51]Train:   1%|          | 39/4296 [00:26<43:51]Train:   1%|          | 40/4296 [00:26<42:54]Train:   1%|          | 40/4296 [00:27<42:54]Train:   1%|          | 41/4296 [00:27<51:19]Train:   1%|          | 41/4296 [00:27<51:19]Train:   1%|          | 42/4296 [00:27<51:11]Train:   1%|          | 42/4296 [00:28<51:11]Train:   1%|          | 43/4296 [00:28<48:10]Train:   1%|          | 43/4296 [00:29<48:10]Train:   1%|          | 44/4296 [00:29<46:19]Train:   1%|          | 44/4296 [00:29<46:19]Train:   1%|          | 45/4296 [00:29<47:15]Train:   1%|          | 45/4296 [00:30<47:15]Train:   1%|          | 46/4296 [00:30<53:23]Train:   1%|          | 46/4296 [00:31<53:23]Train:   1%|          | 47/4296 [00:31<58:01]Train:   1%|          | 47/4296 [00:32<58:01]Train:   1%|          | 48/4296 [00:32<53:59]Train:   1%|          | 48/4296 [00:32<53:59]Train:   1%|          | 49/4296 [00:32<49:45]Train:   1%|          | 49/4296 [00:33<49:45]Train:   1%|          | 50/4296 [00:33<47:26]Train:   1%|          | 50/4296 [00:34<47:26]Train:   1%|          | 51/4296 [00:34<48:40]Train:   1%|          | 51/4296 [00:35<48:40]Train:   1%|          | 52/4296 [00:35<51:12]Train:   1%|          | 52/4296 [00:35<51:12]Train:   1%|          | 53/4296 [00:35<48:04]Train:   1%|          | 53/4296 [00:36<48:04]Train:   1%|▏         | 54/4296 [00:36<50:51]Train:   1%|▏         | 54/4296 [00:36<50:51]Train:   1%|▏         | 55/4296 [00:36<45:49]Train:   1%|▏         | 55/4296 [00:37<45:49]Train:   1%|▏         | 56/4296 [00:37<47:44]Train:   1%|▏         | 56/4296 [00:38<47:44]Train:   1%|▏         | 57/4296 [00:38<46:09]Train:   1%|▏         | 57/4296 [00:38<46:09]Train:   1%|▏         | 58/4296 [00:38<45:10]Train:   1%|▏         | 58/4296 [00:39<45:10]Train:   1%|▏         | 59/4296 [00:39<47:08]Train:   1%|▏         | 59/4296 [00:40<47:08]Train:   1%|▏         | 60/4296 [00:40<48:39]Train:   1%|▏         | 60/4296 [00:40<48:39]Train:   1%|▏         | 61/4296 [00:40<46:25]Train:   1%|▏         | 61/4296 [00:41<46:25]Train:   1%|▏         | 62/4296 [00:41<42:32]Train:   1%|▏         | 62/4296 [00:42<42:32]Train:   1%|▏         | 63/4296 [00:42<44:31]Train:   1%|▏         | 63/4296 [00:42<44:31]Train:   1%|▏         | 64/4296 [00:42<47:17]Train:   1%|▏         | 64/4296 [00:43<47:17]Train:   2%|▏         | 65/4296 [00:43<43:30]Train:   2%|▏         | 65/4296 [00:44<43:30]Train:   2%|▏         | 66/4296 [00:44<45:13]Train:   2%|▏         | 66/4296 [00:44<45:13]Train:   2%|▏         | 67/4296 [00:44<46:26]Train:   2%|▏         | 67/4296 [00:45<46:26]Train:   2%|▏         | 68/4296 [00:45<47:49]Train:   2%|▏         | 68/4296 [00:46<47:49]Train:   2%|▏         | 69/4296 [00:46<48:05]Train:   2%|▏         | 69/4296 [00:46<48:05]Train:   2%|▏         | 70/4296 [00:46<45:59]Train:   2%|▏         | 70/4296 [00:47<45:59]Train:   2%|▏         | 71/4296 [00:47<47:30]Train:   2%|▏         | 71/4296 [00:48<47:30]Train:   2%|▏         | 72/4296 [00:48<46:03]Train:   2%|▏         | 72/4296 [00:48<46:03]Train:   2%|▏         | 73/4296 [00:48<44:17]Train:   2%|▏         | 73/4296 [00:49<44:17]Train:   2%|▏         | 74/4296 [00:49<45:50]Train:   2%|▏         | 74/4296 [00:49<45:50]Train:   2%|▏         | 75/4296 [00:49<44:52]Train:   2%|▏         | 75/4296 [00:50<44:52]Train:   2%|▏         | 76/4296 [00:50<43:38]                                             2026/05/02 22:35:14 INFO mlflow.system_metrics.system_metrics_monitor: Stopping system metrics monitoring...
+2026/05/02 22:35:14 INFO mlflow.system_metrics.system_metrics_monitor: Successfully terminated system metrics monitoring!
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/uasdtu/Documents/chirag/visulogic_eval/trm/train.py", line 390, in <module>
+    main()
+    ~~~~^^
+  File "/home/uasdtu/Documents/chirag/visulogic_eval/trm/train.py", line 340, in main
+    train_metrics = train_one_epoch(
+        model, train_loader, optimizer, scheduler, ema, scaler, device, args,
+        epoch=epoch, global_step_ref=global_step_ref)
+  File "/home/uasdtu/Documents/chirag/visulogic_eval/trm/train.py", line 131, in train_one_epoch
+    outputs = model(x, z, labels=labels, x_mask=x_mask, n_sup_steps=args.n_sup_steps)
+  File "/opt/conda/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1779, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1790, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/uasdtu/Documents/chirag/visulogic_eval/trm/model.py", line 240, in forward
+    (y, z), pred_logits, halt_logits = self.deep_recursion(x, y, z, x_mask)
+                                       ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/uasdtu/Documents/chirag/visulogic_eval/trm/model.py", line 210, in deep_recursion
+    y, z = self.latent_recursion(x, y, z, x_mask)
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/uasdtu/Documents/chirag/visulogic_eval/trm/model.py", line 195, in latent_recursion
+    z = self._update_z(x, y, z, x_mask)
+  File "/home/uasdtu/Documents/chirag/visulogic_eval/trm/model.py", line 180, in _update_z
+    out = self.net(combined, mask)
+  File "/opt/conda/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1779, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1790, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/uasdtu/Documents/chirag/visulogic_eval/trm/model.py", line 127, in forward
+    seq = layer(seq, self.freqs_cos, self.freqs_sin, mask)
+  File "/opt/conda/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1779, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1790, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/uasdtu/Documents/chirag/visulogic_eval/trm/model.py", line 99, in forward
+    x = x + self.attn(self.norm1(x), freqs_cos, freqs_sin, mask)
+            ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1779, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1790, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/uasdtu/Documents/chirag/visulogic_eval/trm/model.py", line 85, in forward
+    out = torch.matmul(attn, v)
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 16.00 MiB. GPU 0 has a total capacity of 15.47 GiB of which 18.06 MiB is free. Including non-PyTorch memory, this process has 15.32 GiB memory in use. Of the allocated memory 14.65 GiB is allocated by PyTorch, and 509.48 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+ERROR: CUDA out of memory. Tried to allocate 16.00 MiB. GPU 0 has a total capacity of 15.47 GiB of which 18.06 MiB is free. Including non-PyTorch memory, this process has 15.32 GiB memory in use. Of the allocated memory 14.65 GiB is allocated by PyTorch, and 509.48 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)

@@ -78,7 +78,7 @@ class Attention(nn.Module):
         scores = torch.matmul(q, k.transpose(-2, -1)) / math.sqrt(self.head_dim)
         if mask is not None:
             # mask: (B, S, S) — replace 0s with -inf, clamp NaN after softmax
-            scores = scores.masked_fill(mask.unsqueeze(1) == 0, -1e9)
+            scores = scores.masked_fill(mask.unsqueeze(1) == 0, torch.finfo(scores.dtype).min)
         attn = F.softmax(scores, dim=-1)
         # Zero out attention weights for fully-padded rows to prevent NaN
         attn = attn.nan_to_num(0.0)
@@ -144,6 +144,9 @@ class TRM(nn.Module):
 
         # Learnable initial y embedding
         self.y_init = nn.Parameter(torch.randn(1, 1, dim) * 0.02)
+        # Learnable initial z embedding (used when x_last_only ablation overrides
+        # the data-provided z; harmless extra param otherwise).
+        self.z_init = nn.Parameter(torch.randn(1, 1, dim) * 0.02)
 
         # Output head: maps y → class logits
         self.output_head = nn.Sequential(

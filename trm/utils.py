@@ -81,12 +81,18 @@ def compute_per_tag_accuracy(all_preds, all_labels, all_tags):
     return tag_acc
 
 
-def save_checkpoint(model, ema, optimizer, epoch, val_acc, path):
+def save_checkpoint(model, ema, optimizer, epoch, val_acc, path, save_optimizer=False):
+    """Atomic checkpoint save. Optimizer state is omitted by default to keep the file small —
+    pass save_optimizer=True for resume-friendly latest.pt only."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    torch.save({
+    payload = {
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
         'ema_state_dict': ema.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
         'val_acc': val_acc,
-    }, path)
+    }
+    if save_optimizer and optimizer is not None:
+        payload['optimizer_state_dict'] = optimizer.state_dict()
+    tmp = path + '.tmp'
+    torch.save(payload, tmp)
+    os.replace(tmp, path)

@@ -79,10 +79,23 @@ def parse_args():
     parser.add_argument('--no_fp16', action='store_true',
                         help='Disable mixed precision training')
 
+    # Sequence pruning
+    parser.add_argument('--max_seq_len', type=int, default=None,
+                        help='If set, truncate x to this many tokens (keeps the tail near z).')
+    parser.add_argument('--x_last_only', action='store_true',
+                        help='Ablation: use only the final (generation) hidden token as x; '
+                             'initialise both y and z from learnable parameters.')
+
     # Logging
     parser.add_argument('--log_dir', type=str, default='logs')
     parser.add_argument('--ckpt_dir', type=str, default='checkpoints/trm')
     parser.add_argument('--mlflow_experiment', type=str, default='TRM-VisuLogic')
+    parser.add_argument('--run_name', type=str, default=None,
+                        help='MLflow run name. Defaults to TRM-{model_name}.')
+    parser.add_argument('--run_tag', type=str, default=None,
+                        help='Optional ablation tag added to mlflow as a tag.')
+    parser.add_argument('--iter_log_every', type=int, default=20,
+                        help='Log per-iteration train metrics to MLflow every N optimizer steps.')
 
     args = parser.parse_args()
 
@@ -98,7 +111,8 @@ def parse_args():
     return args
 
 
-def train_one_epoch(model, loader, optimizer, scheduler, ema, scaler, device, args):
+def train_one_epoch(model, loader, optimizer, scheduler, ema, scaler, device, args,
+                    epoch=0, global_step_ref=None):
     model.train()
     total_loss = 0.0
     total_pred_loss = 0.0
@@ -115,6 +129,8 @@ def train_one_epoch(model, loader, optimizer, scheduler, ema, scaler, device, ar
         z = batch['z'].to(device)
         x_mask = batch['x_mask'].to(device)
         labels = batch['labels'].to(device)
+        if args.x_last_only:
+            z = model.z_init.expand(x.shape[0], -1, -1).to(x.dtype)
 
         with autocast('cuda', enabled=args.fp16):
             outputs = model(x, z, labels=labels, x_mask=x_mask, n_sup_steps=args.n_sup_steps)
@@ -130,6 +146,21 @@ def train_one_epoch(model, loader, optimizer, scheduler, ema, scaler, device, ar
             scheduler.step()
             optimizer.zero_grad()
             ema.update(model)
+
+            if global_step_ref is not None:
+                global_step_ref[0] += 1
+                gs = global_step_ref[0]
+                if gs % args.iter_log_every == 0:
+                    try:
+                        mlflow.log_metrics({
+                            'iter/train_loss': outputs['loss'].item(),
+                            'iter/train_pred_loss': outputs['pred_loss'].item(),
+                            'iter/train_halt_loss': outputs['halt_loss'].item(),
+                            'iter/lr': optimizer.param_groups[0]['lr'],
+                            'iter/epoch': epoch,
+                        }, step=gs)
+                    except Exception:
+                        pass
 
         B = labels.shape[0]
         total_loss += outputs['loss'].item() * B
@@ -172,6 +203,8 @@ def validate(model, loader, device, args):
         z = batch['z'].to(device)
         x_mask = batch['x_mask'].to(device)
         labels = batch['labels'].to(device)
+        if args.x_last_only:
+            z = model.z_init.expand(x.shape[0], -1, -1).to(x.dtype)
 
         with autocast('cuda', enabled=args.fp16):
             outputs = model(x, z, labels=labels, x_mask=x_mask, n_sup_steps=args.n_sup_steps)
@@ -216,9 +249,11 @@ def main():
     # Datasets
     print("Loading datasets...")
     train_dataset = HiddenStateDataset(
-        args.train_hidden_dir, args.train_labels, label_key=args.train_label_key)
+        args.train_hidden_dir, args.train_labels, label_key=args.train_label_key,
+        max_seq_len=args.max_seq_len, x_last_only=args.x_last_only)
     val_dataset = HiddenStateDataset(
-        args.val_hidden_dir, args.val_labels, label_key=args.val_label_key)
+        args.val_hidden_dir, args.val_labels, label_key=args.val_label_key,
+        max_seq_len=args.max_seq_len, x_last_only=args.x_last_only)
 
     if len(train_dataset) == 0:
         raise RuntimeError(f"No training samples found in {args.train_hidden_dir}")
@@ -249,8 +284,9 @@ def main():
     print(f"TRM parameters: {n_params:,} ({n_params / 1e6:.1f}M)")
 
     # Optimizer — separate LR for y_init embedding
-    embed_params = [model.y_init]
-    net_params = [p for name, p in model.named_parameters() if 'y_init' not in name]
+    embed_params = [model.y_init, model.z_init]
+    net_params = [p for name, p in model.named_parameters()
+                  if 'y_init' not in name and 'z_init' not in name]
     optimizer = torch.optim.AdamW([
         {'params': net_params, 'lr': args.lr},
         {'params': embed_params, 'lr': args.lr_embed},
@@ -278,16 +314,32 @@ def main():
     logger.log(f"Train samples: {len(train_dataset)}, Val samples: {len(val_dataset)}")
     logger.log(f"Steps/epoch: {steps_per_epoch}, Total steps: {total_steps}, Warmup: {warmup_steps}")
 
-    # MLflow
+    # MLflow — enable system metrics (CPU/GPU/RAM) before starting the run
+    try:
+        mlflow.enable_system_metrics_logging()
+    except Exception as e:
+        print(f"[warn] could not enable mlflow system metrics: {e}")
     mlflow.set_experiment(args.mlflow_experiment)
-    run = mlflow.start_run(run_name=f"TRM-{args.model_name}")
+    run_name = args.run_name or f"TRM-{args.model_name}"
+    if args.run_tag:
+        run_name = f"{run_name}-{args.run_tag}"
+    run = mlflow.start_run(run_name=run_name)
     mlflow.log_params({k: v for k, v in vars(args).items() if not k.startswith('_')})
     mlflow.log_param("n_params", n_params)
+    mlflow.set_tag("model_name", args.model_name)
+    mlflow.set_tag("mlp_ratio", str(args.mlp_ratio))
+    mlflow.set_tag("max_seq_len", str(args.max_seq_len))
+    mlflow.set_tag("x_last_only", str(args.x_last_only))
+    if args.run_tag:
+        mlflow.set_tag("ablation", args.run_tag)
 
     # Training loop
     best_val_acc = 0.0
     patience_counter = 0
     ckpt_dir = os.path.join(args.ckpt_dir, args.model_name)
+    if args.run_tag:
+        ckpt_dir = os.path.join(ckpt_dir, args.run_tag)
+    global_step_ref = [0]
 
     try:
         for epoch in range(1, args.epochs + 1):
@@ -295,7 +347,8 @@ def main():
 
             # Train
             train_metrics = train_one_epoch(
-                model, train_loader, optimizer, scheduler, ema, scaler, device, args)
+                model, train_loader, optimizer, scheduler, ema, scaler, device, args,
+                epoch=epoch, global_step_ref=global_step_ref)
 
             # Validate with EMA weights
             val_metrics = validate(ema.shadow, val_loader, device, args)
