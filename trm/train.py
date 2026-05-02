@@ -12,6 +12,7 @@ Usage:
 import sys
 sys.path.append(".")
 import argparse
+import math
 import os
 
 # Parse GPU early
@@ -21,7 +22,7 @@ _early, _ = _parser.parse_known_args()
 os.environ["CUDA_VISIBLE_DEVICES"] = str(_early.gpu)
 
 import torch
-import torch.nn.functional as F
+from torch.amp import GradScaler, autocast
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
 from tqdm import tqdm
@@ -30,7 +31,7 @@ import mlflow
 
 from trm.model import TRM
 from trm.dataset import HiddenStateDataset, collate_fn
-from trm.utils import EMA, TextLogger, compute_accuracy, compute_per_tag_accuracy, save_checkpoint
+from trm.utils import EMA, TextLogger, compute_per_tag_accuracy, save_checkpoint
 
 
 def parse_args():
@@ -73,6 +74,10 @@ def parse_args():
     parser.add_argument('--gpu', type=int, default=0)
     parser.add_argument('--num_workers', type=int, default=4)
     parser.add_argument('--seed', type=int, default=42)
+    parser.add_argument('--fp16', action='store_true', default=True,
+                        help='Use mixed precision training (default: True)')
+    parser.add_argument('--no_fp16', action='store_true',
+                        help='Disable mixed precision training')
 
     # Logging
     parser.add_argument('--log_dir', type=str, default='logs')
@@ -80,6 +85,9 @@ def parse_args():
     parser.add_argument('--mlflow_experiment', type=str, default='TRM-VisuLogic')
 
     args = parser.parse_args()
+
+    if args.no_fp16:
+        args.fp16 = False
 
     # Set default paths based on model_name
     if args.train_hidden_dir is None:
@@ -90,7 +98,7 @@ def parse_args():
     return args
 
 
-def train_one_epoch(model, loader, optimizer, scheduler, ema, device, args):
+def train_one_epoch(model, loader, optimizer, scheduler, ema, scaler, device, args):
     model.train()
     total_loss = 0.0
     total_pred_loss = 0.0
@@ -108,14 +116,17 @@ def train_one_epoch(model, loader, optimizer, scheduler, ema, device, args):
         x_mask = batch['x_mask'].to(device)
         labels = batch['labels'].to(device)
 
-        outputs = model(x, z, labels=labels, x_mask=x_mask, n_sup_steps=args.n_sup_steps)
+        with autocast('cuda', enabled=args.fp16):
+            outputs = model(x, z, labels=labels, x_mask=x_mask, n_sup_steps=args.n_sup_steps)
+            loss = outputs['loss'] / args.grad_accum_steps
 
-        loss = outputs['loss'] / args.grad_accum_steps
-        loss.backward()
+        scaler.scale(loss).backward()
 
         if (step + 1) % args.grad_accum_steps == 0 or (step + 1) == len(loader):
+            scaler.unscale_(optimizer)
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-            optimizer.step()
+            scaler.step(optimizer)
+            scaler.update()
             scheduler.step()
             optimizer.zero_grad()
             ema.update(model)
@@ -124,7 +135,7 @@ def train_one_epoch(model, loader, optimizer, scheduler, ema, device, args):
         total_loss += outputs['loss'].item() * B
         total_pred_loss += outputs['pred_loss'].item() * B
         total_halt_loss += outputs['halt_loss'].item() * B
-        total_correct += (outputs['logits'].argmax(-1) == labels).sum().item()
+        total_correct += (outputs['logits'].detach().argmax(-1) == labels).sum().item()
         total_samples += B
 
         pbar.set_postfix(
@@ -162,7 +173,8 @@ def validate(model, loader, device, args):
         x_mask = batch['x_mask'].to(device)
         labels = batch['labels'].to(device)
 
-        outputs = model(x, z, labels=labels, x_mask=x_mask, n_sup_steps=args.n_sup_steps)
+        with autocast('cuda', enabled=args.fp16):
+            outputs = model(x, z, labels=labels, x_mask=x_mask, n_sup_steps=args.n_sup_steps)
 
         B = labels.shape[0]
         total_loss += outputs['loss'].item() * B
@@ -195,10 +207,11 @@ def main():
     # Seed
     torch.manual_seed(args.seed)
     if torch.cuda.is_available():
-        torch.cuda.manual_seed(args.seed)
+        torch.cuda.manual_seed_all(args.seed)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
+    print(f"Mixed precision: {args.fp16}")
 
     # Datasets
     print("Loading datasets...")
@@ -207,9 +220,15 @@ def main():
     val_dataset = HiddenStateDataset(
         args.val_hidden_dir, args.val_labels, label_key=args.val_label_key)
 
+    if len(train_dataset) == 0:
+        raise RuntimeError(f"No training samples found in {args.train_hidden_dir}")
+    if len(val_dataset) == 0:
+        raise RuntimeError(f"No validation samples found in {args.val_hidden_dir}")
+
     train_loader = DataLoader(
         train_dataset, batch_size=args.batch_size, shuffle=True,
-        collate_fn=collate_fn, num_workers=args.num_workers, pin_memory=True)
+        collate_fn=collate_fn, num_workers=args.num_workers, pin_memory=True,
+        drop_last=True)
     val_loader = DataLoader(
         val_dataset, batch_size=args.batch_size, shuffle=False,
         collate_fn=collate_fn, num_workers=args.num_workers, pin_memory=True)
@@ -238,12 +257,16 @@ def main():
     ], betas=(0.9, 0.95), weight_decay=args.weight_decay)
 
     # Scheduler: linear warmup + cosine decay
-    total_steps = len(train_loader) * args.epochs // args.grad_accum_steps
-    warmup_steps = int(total_steps * args.warmup_ratio)
+    steps_per_epoch = math.ceil(len(train_loader) / args.grad_accum_steps)
+    total_steps = steps_per_epoch * args.epochs
+    warmup_steps = max(1, int(total_steps * args.warmup_ratio))
     warmup_scheduler = LinearLR(optimizer, start_factor=0.01, total_iters=warmup_steps)
-    cosine_scheduler = CosineAnnealingLR(optimizer, T_max=total_steps - warmup_steps)
+    cosine_scheduler = CosineAnnealingLR(optimizer, T_max=max(1, total_steps - warmup_steps))
     scheduler = SequentialLR(optimizer, [warmup_scheduler, cosine_scheduler],
                              milestones=[warmup_steps])
+
+    # Mixed precision scaler
+    scaler = GradScaler('cuda', enabled=args.fp16)
 
     # EMA
     ema = EMA(model, decay=args.ema_decay)
@@ -253,10 +276,11 @@ def main():
     logger.log(f"Config: {vars(args)}")
     logger.log(f"TRM parameters: {n_params:,}")
     logger.log(f"Train samples: {len(train_dataset)}, Val samples: {len(val_dataset)}")
+    logger.log(f"Steps/epoch: {steps_per_epoch}, Total steps: {total_steps}, Warmup: {warmup_steps}")
 
     # MLflow
     mlflow.set_experiment(args.mlflow_experiment)
-    mlflow.start_run(run_name=f"TRM-{args.model_name}")
+    run = mlflow.start_run(run_name=f"TRM-{args.model_name}")
     mlflow.log_params({k: v for k, v in vars(args).items() if not k.startswith('_')})
     mlflow.log_param("n_params", n_params)
 
@@ -265,49 +289,57 @@ def main():
     patience_counter = 0
     ckpt_dir = os.path.join(args.ckpt_dir, args.model_name)
 
-    for epoch in range(1, args.epochs + 1):
-        logger.log(f"--- Epoch {epoch}/{args.epochs} ---")
+    try:
+        for epoch in range(1, args.epochs + 1):
+            logger.log(f"--- Epoch {epoch}/{args.epochs} ---")
 
-        # Train
-        train_metrics = train_one_epoch(model, train_loader, optimizer, scheduler, ema, device, args)
+            # Train
+            train_metrics = train_one_epoch(
+                model, train_loader, optimizer, scheduler, ema, scaler, device, args)
 
-        # Validate with EMA weights
-        val_metrics = validate(ema.shadow, val_loader, device, args)
-        tag_acc = val_metrics.pop('tag_acc')
+            # Validate with EMA weights
+            val_metrics = validate(ema.shadow, val_loader, device, args)
+            tag_acc = val_metrics.pop('tag_acc')
 
-        # Log
-        logger.log_epoch(epoch, train_metrics, val_metrics)
-        for tag, acc in tag_acc.items():
-            logger.log(f"  {tag}: {acc:.4f}")
+            # Log to text file
+            logger.log_epoch(epoch, train_metrics, val_metrics)
+            for tag, acc in tag_acc.items():
+                logger.log(f"  {tag}: {acc:.4f}")
 
-        # MLflow logging
-        mlflow.log_metrics({f"train_{k}": v for k, v in train_metrics.items()}, step=epoch)
-        mlflow.log_metrics({f"val_{k}": v for k, v in val_metrics.items()}, step=epoch)
-        for tag, acc in tag_acc.items():
-            safe_tag = tag.replace(" ", "_").lower()
-            mlflow.log_metric(f"val_tag_{safe_tag}", acc, step=epoch)
-        mlflow.log_metric("lr", optimizer.param_groups[0]['lr'], step=epoch)
+            # MLflow logging
+            mlflow.log_metrics({f"train_{k}": v for k, v in train_metrics.items()}, step=epoch)
+            mlflow.log_metrics({f"val_{k}": v for k, v in val_metrics.items()}, step=epoch)
+            for tag, acc in tag_acc.items():
+                safe_tag = tag.replace(" ", "_").lower()
+                mlflow.log_metric(f"val_tag_{safe_tag}", acc, step=epoch)
+            mlflow.log_metric("lr", optimizer.param_groups[0]['lr'], step=epoch)
 
-        # Checkpointing
-        save_checkpoint(model, ema, optimizer, epoch, val_metrics['acc'],
-                        os.path.join(ckpt_dir, 'latest.pt'))
+            # Checkpointing
+            save_checkpoint(model, ema, optimizer, epoch, val_metrics['acc'],
+                            os.path.join(ckpt_dir, 'latest.pt'))
 
-        if val_metrics['acc'] > best_val_acc:
-            best_val_acc = val_metrics['acc']
-            patience_counter = 0
-            save_checkpoint(model, ema, optimizer, epoch, best_val_acc,
-                            os.path.join(ckpt_dir, 'best.pt'))
-            logger.log(f"  New best val acc: {best_val_acc:.4f}")
-            mlflow.log_metric("best_val_acc", best_val_acc, step=epoch)
-        else:
-            patience_counter += 1
-            if patience_counter >= args.patience:
-                logger.log(f"Early stopping at epoch {epoch} (patience={args.patience})")
-                break
+            if val_metrics['acc'] > best_val_acc:
+                best_val_acc = val_metrics['acc']
+                patience_counter = 0
+                save_checkpoint(model, ema, optimizer, epoch, best_val_acc,
+                                os.path.join(ckpt_dir, 'best.pt'))
+                logger.log(f"  >> New best val acc: {best_val_acc:.4f}")
+                mlflow.log_metric("best_val_acc", best_val_acc, step=epoch)
+            else:
+                patience_counter += 1
+                logger.log(f"  No improvement ({patience_counter}/{args.patience})")
+                if patience_counter >= args.patience:
+                    logger.log(f"Early stopping at epoch {epoch} (patience={args.patience})")
+                    break
 
-    logger.log(f"Training complete. Best val acc: {best_val_acc:.4f}")
-    mlflow.log_metric("final_best_val_acc", best_val_acc)
-    mlflow.end_run()
+        logger.log(f"Training complete. Best val acc: {best_val_acc:.4f}")
+        mlflow.log_metric("final_best_val_acc", best_val_acc)
+
+    except Exception as e:
+        logger.log(f"ERROR: {e}")
+        raise
+    finally:
+        mlflow.end_run()
 
 
 if __name__ == '__main__':
