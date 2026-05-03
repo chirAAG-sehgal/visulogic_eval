@@ -1,0 +1,16 @@
+TRM Training Log — Qwen3-VL-2B-Instruct — 20260503_144920
+================================================================================
+[14:49:20] Config: {'model_name': 'Qwen3-VL-2B-Instruct', 'train_hidden_dir': 'outputs/hidden_states/Qwen3-VL-2B-Instruct', 'val_hidden_dir': 'outputs/hidden_states/val/Qwen3-VL-2B-Instruct', 'train_labels': 'data/visulogic_train/visulogic_train_qwen.jsonl', 'val_labels': 'data/visulogic_benchmark/data.jsonl', 'train_label_key': 'answer', 'val_label_key': 'label', 'dim': 128, 'input_dim': 2048, 'n_heads': 2, 'n_layers': 2, 'mlp_ratio': 2, 'n_classes': 4, 'no_rope': True, 'block_type': 'attn', 'n_latent_steps': 6, 'n_deep_passes': 3, 'n_sup_steps': 16, 'batch_size': 32, 'grad_accum_steps': 2, 'epochs': 1, 'lr': 0.0001, 'lr_embed': 0.01, 'weight_decay': 0.01, 'warmup_ratio': 0.05, 'ema_decay': 0.999, 'patience': 20, 'gpu': 1, 'num_workers': 4, 'seed': 42, 'fp16': False, 'no_fp16': True, 'max_seq_len': None, 'x_last_only': True, 'log_dir': 'logs', 'ckpt_dir': 'checkpoints/trm', 'mlflow_experiment': 'TRM-VisuLogic', 'run_name': None, 'run_tag': 'SMOKE_d128_attn_norope', 'iter_log_every': 20}
+[14:49:20] TRM parameters: 591,488
+[14:49:20] Train samples: 4296, Val samples: 1000
+[14:49:20] Steps/epoch: 67, Total steps: 67, Warmup: 3
+[14:49:20] --- Epoch 1/1 ---
+[14:50:01] Epoch 001 | train_loss=1.9825 | train_pred_loss=1.3936 | train_halt_loss=0.5889 | train_acc=0.2738 | val_loss=2.0564 | val_pred_loss=1.4542 | val_halt_loss=0.6021 | val_acc=0.2470
+[14:50:01]   Attribute Reasoning: 0.2439
+[14:50:01]   Other: 0.2130
+[14:50:01]   Positional Reasoning: 0.2794
+[14:50:01]   Quantitative Reasoning: 0.2210
+[14:50:01]   Spatial Reasoning: 0.2684
+[14:50:01]   Stylistic Reasoning: 0.2889
+[14:50:01]   >> New best val acc: 0.2470
+[14:50:01] Training complete. Best val acc: 0.2470

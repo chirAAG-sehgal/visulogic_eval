@@ -1,0 +1,175 @@
+import sys
+sys.path.append(".")
+import argparse
+import os
+
+# Parse --gpu_ids early so CUDA_VISIBLE_DEVICES is set before torch is imported
+_parser = argparse.ArgumentParser(add_help=False)
+_parser.add_argument('--gpu_ids', type=str, default=None)
+_early_args, _ = _parser.parse_known_args()
+if _early_args.gpu_ids is not None:
+    os.environ["CUDA_VISIBLE_DEVICES"] = _early_args.gpu_ids
+
+import json
+import torch
+from PIL import Image
+from tqdm import tqdm
+from transformers import AutoConfig, AutoProcessor
+from models.prompts import COT_PROMPT, RL_COT_PROMPT, SFT_PROMPT
+
+
+def load_vlm(model_path):
+    """Load a Qwen2.5-VL or Qwen3-VL checkpoint with the right model class."""
+    cfg = AutoConfig.from_pretrained(model_path)
+    model_type = getattr(cfg, "model_type", "") or ""
+    if "qwen3" in model_type:
+        from transformers import Qwen3VLForConditionalGeneration as ModelCls
+    elif "qwen2_5_vl" in model_type or "qwen2.5" in model_type.lower():
+        from transformers import Qwen2_5_VLForConditionalGeneration as ModelCls
+    else:
+        from transformers import AutoModelForImageTextToText as ModelCls
+    print(f"[load_vlm] model_type={model_type} -> {ModelCls.__name__}")
+    return ModelCls.from_pretrained(
+        model_path,
+        torch_dtype="auto",
+        device_map="auto",
+    )
+
+
+def load_data(input_file):
+    data = []
+    with open(input_file, 'r', encoding='utf-8') as f:
+        for line in f:
+            data.append(json.loads(line.strip()))
+    return data
+
+
+def prepare_input(processor, image_path, text, user_prompt):
+    image = Image.open(image_path).convert("RGB")
+    input_text = text + user_prompt
+
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {"type": "image", "image": image},
+                {"type": "text", "text": input_text},
+            ],
+        }
+    ]
+
+    inputs = processor.apply_chat_template(
+        messages,
+        tokenize=True,
+        add_generation_prompt=True,
+        return_dict=True,
+        return_tensors="pt",
+    )
+
+    # Decode the full prompt text (with special tokens) for logging
+    prompt_text = processor.decode(inputs["input_ids"][0], skip_special_tokens=False)
+
+    return inputs, prompt_text
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Extract final layer hidden states from Qwen3-VL")
+    parser.add_argument('--input_file', type=str, default='data/visulogic_train/data.jsonl')
+    parser.add_argument('--model_path', type=str, default='weights/Qwen_Qwen3-VL-2B-Instruct')
+    parser.add_argument('--output_dir', type=str, default=None,
+                        help='Output directory. Defaults to outputs/hidden_states/{model_name}/')
+    parser.add_argument('--gpu_ids', type=str, default=None)
+    parser.add_argument('--user_prompt', type=str, default='sft',
+                        choices=['sft', 'cot', 'rl_cot'],
+                        help='Prompt type to append to questions')
+    parser.add_argument('--last_only', action='store_true',
+                        help='Save only the final-position hidden state (1, 1, D) instead '
+                             'of the full sequence — for x_last_only ablation.')
+
+    args = parser.parse_args()
+
+    # Resolve prompt
+    prompt_map = {'sft': SFT_PROMPT, 'cot': COT_PROMPT, 'rl_cot': RL_COT_PROMPT}
+    user_prompt = prompt_map[args.user_prompt]
+
+    # Resolve output dir
+    model_name = os.path.basename(args.model_path)
+    output_dir = args.output_dir or os.path.join('outputs', 'hidden_states/val', model_name)
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Load model (auto-detects Qwen2.5-VL vs Qwen3-VL)
+    print(f"Loading model from {args.model_path} ...")
+    model = load_vlm(args.model_path)
+    model.eval()
+    processor = AutoProcessor.from_pretrained(args.model_path)
+
+    # Load data
+    base_dir = os.path.dirname(args.input_file)
+    data = load_data(args.input_file)
+    print(f"Loaded {len(data)} samples. Saving to {output_dir}")
+
+    # Prompts metadata file
+    prompts_dir = os.path.join(output_dir, "prompts")
+    os.makedirs(prompts_dir, exist_ok=True)
+
+    skipped = 0
+    pbar = tqdm(data, desc="Extracting hidden states", unit="sample",
+                bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}]")
+
+    for item in pbar:
+        sample_id = item['id']
+        out_path = os.path.join(output_dir, f"{sample_id}.pt")
+        prompt_path = os.path.join(prompts_dir, f"{sample_id}.json")
+
+        # Skip if already extracted
+        if os.path.exists(out_path):
+            skipped += 1
+            pbar.set_postfix(skipped=skipped)
+            continue
+
+        image_name = f"{sample_id}.png"
+        image_path = os.path.join(base_dir, "images/"+image_name)
+        inputs, prompt_text = prepare_input(processor, image_path, item['question'], user_prompt)
+        inputs = inputs.to(model.device)
+
+        # Save prompt metadata
+        prompt_meta = {
+            "id": sample_id,
+            "image": image_name,
+            "prompt": prompt_text,
+            "seq_len": inputs["input_ids"].shape[1],
+        }
+        with open(prompt_path, 'w', encoding='utf-8') as f:
+            json.dump(prompt_meta, f, ensure_ascii=False, indent=2)
+
+        with torch.no_grad():
+            outputs = model(
+                **inputs,
+                output_hidden_states=True,
+            )
+
+        # outputs.hidden_states is a tuple of (num_layers + 1) tensors
+        # Index 0 = embedding output, index -1 = final transformer layer output
+        # Shape: (1, seq_len, hidden_dim)
+        final_hidden = outputs.hidden_states[-1].cpu()
+        if args.last_only:
+            # .clone() breaks storage aliasing — a slice is a view onto the full
+            # sequence's storage, and torch.save writes the whole underlying buffer.
+            # Without this, each "last token" file balloons to ~seq_len x its real size.
+            final_hidden = final_hidden[:, -1:, :].contiguous().clone()
+
+        torch.save(final_hidden, out_path)
+
+        pbar.set_postfix(
+            seq_len=inputs["input_ids"].shape[1],
+            hidden=list(final_hidden.shape),
+            skipped=skipped,
+        )
+
+    print(f"\nDone. Hidden states saved to {output_dir}")
+    print(f"Prompt metadata saved to {prompts_dir}")
+    print(f"Total: {len(data)}, Extracted: {len(data) - skipped}, Skipped: {skipped}")
+
+
+if __name__ == '__main__':
+    main()

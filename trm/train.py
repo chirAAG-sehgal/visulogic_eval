@@ -50,11 +50,20 @@ def parse_args():
     parser.add_argument('--val_label_key', type=str, default='label')
 
     # Architecture
-    parser.add_argument('--dim', type=int, default=2048)
+    parser.add_argument('--dim', type=int, default=2048,
+                        help='TRM internal hidden dim.')
+    parser.add_argument('--input_dim', type=int, default=None,
+                        help='VLM hidden size (input to TRM). Defaults to --dim. '
+                             'When different from --dim, an input projection layer is added.')
     parser.add_argument('--n_heads', type=int, default=16)
     parser.add_argument('--n_layers', type=int, default=2)
     parser.add_argument('--mlp_ratio', type=int, default=4)
     parser.add_argument('--n_classes', type=int, default=4)
+    parser.add_argument('--no_rope', action='store_true',
+                        help='Disable RoPE in self-attention (paper §4.5: not needed when L <= D).')
+    parser.add_argument('--block_type', type=str, default='attn',
+                        choices=['attn', 'mixer'],
+                        help="'attn' = self-attention (default). 'mixer' = MLP-Mixer per paper §4.5.")
 
     # Recursion
     parser.add_argument('--n_latent_steps', type=int, default=6)
@@ -129,11 +138,10 @@ def train_one_epoch(model, loader, optimizer, scheduler, ema, scaler, device, ar
         z = batch['z'].to(device)
         x_mask = batch['x_mask'].to(device)
         labels = batch['labels'].to(device)
-        if args.x_last_only:
-            z = model.z_init.expand(x.shape[0], -1, -1).to(x.dtype)
-
         with autocast('cuda', enabled=args.fp16):
-            outputs = model(x, z, labels=labels, x_mask=x_mask, n_sup_steps=args.n_sup_steps)
+            outputs = model(x, z, labels=labels, x_mask=x_mask,
+                            n_sup_steps=args.n_sup_steps,
+                            x_last_only=args.x_last_only)
             loss = outputs['loss'] / args.grad_accum_steps
 
         scaler.scale(loss).backward()
@@ -203,11 +211,10 @@ def validate(model, loader, device, args):
         z = batch['z'].to(device)
         x_mask = batch['x_mask'].to(device)
         labels = batch['labels'].to(device)
-        if args.x_last_only:
-            z = model.z_init.expand(x.shape[0], -1, -1).to(x.dtype)
-
         with autocast('cuda', enabled=args.fp16):
-            outputs = model(x, z, labels=labels, x_mask=x_mask, n_sup_steps=args.n_sup_steps)
+            outputs = model(x, z, labels=labels, x_mask=x_mask,
+                            n_sup_steps=args.n_sup_steps,
+                            x_last_only=args.x_last_only)
 
         B = labels.shape[0]
         total_loss += outputs['loss'].item() * B
@@ -270,14 +277,27 @@ def main():
 
     # Model
     print("Building TRM...")
+    # In x_last_only mode the (x,y,z) sequence has length 3; the y-update sees length 2.
+    # Mixer needs these fixed L values up front.
+    z_seq_len = 3 if args.x_last_only else None
+    y_seq_len = 2 if args.x_last_only else None
+    if args.block_type == 'mixer' and not args.x_last_only:
+        raise NotImplementedError(
+            "block_type=mixer currently requires --x_last_only (fixed L). "
+            "For full-seq, attention is the right choice (paper §4.5).")
     model = TRM(
         dim=args.dim,
+        input_dim=args.input_dim if args.input_dim is not None else args.dim,
         n_heads=args.n_heads,
         n_layers=args.n_layers,
         mlp_ratio=args.mlp_ratio,
         n_classes=args.n_classes,
         n_latent_steps=args.n_latent_steps,
         n_deep_passes=args.n_deep_passes,
+        use_rope=(not args.no_rope),
+        block_type=args.block_type,
+        z_seq_len=z_seq_len,
+        y_seq_len=y_seq_len,
     ).to(device)
 
     n_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
@@ -330,6 +350,9 @@ def main():
     mlflow.set_tag("mlp_ratio", str(args.mlp_ratio))
     mlflow.set_tag("max_seq_len", str(args.max_seq_len))
     mlflow.set_tag("x_last_only", str(args.x_last_only))
+    mlflow.set_tag("input_dim", str(args.input_dim if args.input_dim is not None else args.dim))
+    mlflow.set_tag("no_rope", str(args.no_rope))
+    mlflow.set_tag("block_type", args.block_type)
     if args.run_tag:
         mlflow.set_tag("ablation", args.run_tag)
 
