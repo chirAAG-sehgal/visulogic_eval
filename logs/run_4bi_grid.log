@@ -1,0 +1,7 @@
+[GPU 0] Qwen3-VL-4B-Instruct  input_dim=2560  dim=128  n_heads=2  tag=xlast_d128_norope  log=logs/trm_4b_xlast_d128_norope.log
+[GPU 0] Qwen3-VL-4B-Instruct  input_dim=2560  dim=256  n_heads=4  tag=xlast_d256_norope  log=logs/trm_4b_xlast_d256_norope.log
+[GPU 0] Qwen3-VL-4B-Instruct  input_dim=2560  dim=512  n_heads=8  tag=xlast_d512_norope  log=logs/trm_4b_xlast_d512_norope.log
+[GPU 0] Qwen3-VL-4B-Instruct  input_dim=2560  dim=1024  n_heads=16  tag=xlast_d1024_norope  log=logs/trm_4b_xlast_d1024_norope.log
+[GPU 0] Qwen3-VL-4B-Instruct  input_dim=2560  dim=2048  n_heads=32  tag=xlast_d2048_norope  log=logs/trm_4b_xlast_d2048_norope.log
+[GPU 0] Qwen3-VL-4B-Instruct  input_dim=2560  dim=2560  n_heads=32  tag=xlast_d2560_norope  log=logs/trm_4b_xlast_d2560_norope.log
+[GPU 0] Grid complete for Qwen3-VL-4B-Instruct: dims = 128 256 512 1024 2048 2560

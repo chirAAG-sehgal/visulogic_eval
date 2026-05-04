@@ -1,0 +1,6 @@
+[fix] downloading via hf cli with up to 5 retries
+/opt/conda/lib/python3.13/site-packages/huggingface_hub/cli/download.py:146: UserWarning: Ignoring `--include` since filenames have being explicitly set.
+  warnings.warn("Ignoring `--include` since filenames have being explicitly set.")
+path=/home/uasdtu/.cache/huggingface/hub/models--Qwen--Qwen3-VL-4B-Thinking/snapshots/1de27d8c51f12e819435303b9e84c4e25ba8401e
+[fix] download attempt 1 succeeded
+[fix] launching extraction (train)

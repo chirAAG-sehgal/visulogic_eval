@@ -1,0 +1,9 @@
+[queue] waiting for 7B@3584 (PID 172060) to finish...
+[queue] 7B@3584 finished. Launching 2B-Thinking grid on GPU 1.
+[GPU 1] Qwen3-VL-2B-Thinking  input_dim=2048  dim=128  n_heads=2  tag=xlast_d128_norope  log=logs/trm_2bt_xlast_d128_norope.log
+[GPU 1] Qwen3-VL-2B-Thinking  input_dim=2048  dim=256  n_heads=4  tag=xlast_d256_norope  log=logs/trm_2bt_xlast_d256_norope.log
+[GPU 1] Qwen3-VL-2B-Thinking  input_dim=2048  dim=512  n_heads=8  tag=xlast_d512_norope  log=logs/trm_2bt_xlast_d512_norope.log
+[GPU 1] Qwen3-VL-2B-Thinking  input_dim=2048  dim=1024  n_heads=16  tag=xlast_d1024_norope  log=logs/trm_2bt_xlast_d1024_norope.log
+[GPU 1] Qwen3-VL-2B-Thinking  input_dim=2048  dim=2048  n_heads=32  tag=xlast_d2048_norope  log=logs/trm_2bt_xlast_d2048_norope.log
+[GPU 1] Grid complete for Qwen3-VL-2B-Thinking: dims = 128 256 512 1024 2048
+[queue] 2B-Thinking grid complete.

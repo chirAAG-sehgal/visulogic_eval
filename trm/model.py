@@ -105,21 +105,25 @@ class TransformerLayer(nn.Module):
 
 class MixerLayer(nn.Module):
     """
-    MLP-Mixer style block (paper §4.5): token-mixing followed by channel-mixing.
-    Recommended when L <= D, e.g. our x_last_only mode where L=3 (or L=2 in y-update).
-    No positional encoding (token positions are mixed by a fixed Linear over L).
+    MLP-Mixer style block (paper §4.5): token-mixing MLP followed by channel-mixing MLP.
+    Recommended when L <= D — our x_last_only mode has L=3 for z-update or L=2 for y-update.
+    Both MLPs use SwiGLU activations to match the paper's transformer block style.
+    No positional encoding (token positions are absorbed into the token-mix Linear).
     """
     def __init__(self, dim, seq_len, mlp_ratio=4):
         super().__init__()
         self.seq_len = seq_len
         self.norm1 = RMSNorm(dim)
-        # Token-mixing MLP: Linear(L, L) applied along the sequence axis
-        self.token_mix = nn.Linear(seq_len, seq_len, bias=False)
+        # Token-mixing: 2-layer SwiGLU MLP applied across the sequence axis.
+        # Hidden width = max(seq_len * mlp_ratio, seq_len) so it always has at least L params.
+        token_hidden = max(seq_len * mlp_ratio, seq_len)
+        self.token_mix = SwiGLU(seq_len, token_hidden)
         self.norm2 = RMSNorm(dim)
+        # Channel-mixing: SwiGLU MLP across the feature axis (same as transformer block).
         self.channel_mix = SwiGLU(dim, dim * mlp_ratio)
 
     def forward(self, x, *_args, **_kwargs):
-        # x: (B, L, D). Token mix operates on the L axis.
+        # x: (B, L, D). Token-mix runs on the L axis -> transpose, mix, transpose back.
         h = self.norm1(x)
         h = self.token_mix(h.transpose(1, 2)).transpose(1, 2)  # (B, L, D)
         x = x + h

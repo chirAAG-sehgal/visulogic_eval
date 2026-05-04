@@ -1,0 +1,3 @@
+[queue7b] waiting for 2B-Thinking grid (PID 201763) to finish...
+[queue7b] 2B-Thinking grid finished. Launching 7B@3584 (full run, patience=20) on GPU 1.
+[queue7b] 7B@3584 v2 done.

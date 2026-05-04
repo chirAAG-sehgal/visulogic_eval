@@ -1,0 +1,6 @@
+[chain] waiting for 2B-Thinking extraction PID 183710 to finish...
+[chain] 2B-Thinking extraction done. Disk:
+/dev/nvme1n1p2  468G  425G   19G  96% /
+[chain] freeing Qwen3-VL-2B-Thinking weights cache
+/dev/nvme1n1p2  468G  421G   23G  95% /
+[chain] launching 4B-Thinking extraction on GPU 0 (will download ~8 GB first)

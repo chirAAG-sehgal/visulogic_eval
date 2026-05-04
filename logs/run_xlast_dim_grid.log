@@ -1,2 +1,3 @@
 Grid PIDs: 2b=134450, 7b=134451
 Tail:  tail -f logs/trm_2b_xlast_d*.log logs/trm_7b_xlast_d*.log
+Both grids complete.

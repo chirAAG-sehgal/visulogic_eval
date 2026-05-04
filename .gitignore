@@ -1,0 +1,19 @@
+data/
+scripts/trial.py
+scripts/trail2.py
+checkpoints/
+models/__pycache__/
+outputs/hidden_states/
+outputs/qwen3_vl_2b_thinking.jsonl
+
+# Python bytecode (pre-existing tracked .pyc files unaffected; this stops new ones)
+__pycache__/
+*.pyc
+*.pyo
+
+# Stray skill copy at repo root (skill lives at .claude/skills/research-paper-writing/)
+/research-paper-writing/
+
+# MLflow tracking DB (can exceed GitHub 100MB blob limit; regenerable from runs)
+mlflow.db
+mlflow.db-*

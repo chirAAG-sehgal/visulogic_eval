@@ -1,0 +1,204 @@
+[wait] waiting for GPU 0 and GPU 1 to become free (poll every 60s)...
+0, 5648 MiB
+1, 11643 MiB
+0, 5648 MiB
+1, 11643 MiB
+0, 5648 MiB
+1, 11643 MiB
+0, 5648 MiB
+1, 11643 MiB
+0, 5648 MiB
+1, 11643 MiB
+0, 160 MiB
+1, 11643 MiB
+0, 160 MiB
+1, 11643 MiB
+0, 160 MiB
+1, 11643 MiB
+0, 160 MiB
+1, 11643 MiB
+0, 160 MiB
+1, 11643 MiB
+0, 160 MiB
+1, 11643 MiB
+0, 160 MiB
+1, 11643 MiB
+0, 160 MiB
+1, 11643 MiB
+0, 160 MiB
+1, 11643 MiB
+0, 160 MiB
+1, 11643 MiB
+0, 572 MiB
+1, 11643 MiB
+0, 6831 MiB
+1, 11643 MiB
+0, 572 MiB
+1, 11643 MiB
+0, 778 MiB
+1, 11643 MiB
+0, 778 MiB
+1, 11643 MiB
+0, 1260 MiB
+1, 11643 MiB
+0, 1260 MiB
+1, 11643 MiB
+0, 1260 MiB
+1, 11643 MiB
+0, 1260 MiB
+1, 11643 MiB
+0, 13067 MiB
+1, 411 MiB
+0, 13255 MiB
+1, 411 MiB
+0, 2472 MiB
+1, 411 MiB
+0, 5736 MiB
+1, 633 MiB
+0, 5736 MiB
+1, 633 MiB
+0, 5736 MiB
+1, 1095 MiB
+0, 5736 MiB
+1, 1095 MiB
+0, 5736 MiB
+1, 1095 MiB
+0, 5736 MiB
+1, 2307 MiB
+0, 5736 MiB
+1, 2307 MiB
+0, 5736 MiB
+1, 2307 MiB
+0, 5736 MiB
+1, 2307 MiB
+0, 5736 MiB
+1, 5503 MiB
+0, 5736 MiB
+1, 5503 MiB
+0, 5736 MiB
+1, 5503 MiB
+0, 5736 MiB
+1, 5503 MiB
+0, 5736 MiB
+1, 5503 MiB
+0, 5736 MiB
+1, 5503 MiB
+0, 5736 MiB
+1, 5503 MiB
+0, 5736 MiB
+1, 5503 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 7306 MiB
+1, 11643 MiB
+0, 572 MiB
+1, 11643 MiB
+0, 572 MiB
+1, 11643 MiB
+0, 572 MiB
+1, 11643 MiB
+0, 778 MiB
+1, 11643 MiB
+0, 778 MiB
+1, 11643 MiB
+0, 1260 MiB
+1, 11643 MiB
+0, 1260 MiB
+1, 11643 MiB
+0, 2472 MiB
+1, 11643 MiB
+0, 2472 MiB
+1, 11643 MiB
+0, 2472 MiB
+1, 11643 MiB
+0, 2472 MiB
+1, 15 MiB
+0, 2472 MiB
+1, 15 MiB
+0, 5736 MiB
+1, 15 MiB
+0, 5736 MiB
+1, 15 MiB
+0, 5736 MiB
+1, 15 MiB
+0, 5736 MiB
+1, 15 MiB
+0, 5736 MiB
+1, 15 MiB
+0, 5736 MiB
+1, 15 MiB
+0, 5736 MiB
+1, 15 MiB
+0, 5736 MiB
+1, 15 MiB
+0, 5736 MiB
+1, 15 MiB
+0, 5736 MiB
+1, 15 MiB
+0, 5736 MiB
+1, 15 MiB
+[wait] both GPUs free.
+Extract PIDs: 2B-T=242101, 4B-T=242102
+[extract] Qwen3-VL-4B-Thinking already extracted, skipping.
+[extract] Qwen3-VL-2B-Thinking already extracted, skipping.
+[extract] both extractions done.
+Grid PIDs: 4B-Inst=242115, 2B-Thinking=242116
+[GPU 0] Qwen3-VL-4B-Instruct  input_dim=2560  dim=128  n_heads=2  tag=xlast_d128_norope  log=logs/trm_4b_xlast_d128_norope.log
+[GPU 1] Qwen3-VL-2B-Thinking  input_dim=2048  dim=128  n_heads=2  tag=xlast_d128_norope  log=logs/trm_2bt_xlast_d128_norope.log
+[GPU 1] Qwen3-VL-2B-Thinking  input_dim=2048  dim=256  n_heads=4  tag=xlast_d256_norope  log=logs/trm_2bt_xlast_d256_norope.log
+[GPU 0] Qwen3-VL-4B-Instruct  input_dim=2560  dim=256  n_heads=4  tag=xlast_d256_norope  log=logs/trm_4b_xlast_d256_norope.log
+[GPU 0] Qwen3-VL-4B-Instruct  input_dim=2560  dim=512  n_heads=8  tag=xlast_d512_norope  log=logs/trm_4b_xlast_d512_norope.log
+[GPU 1] Qwen3-VL-2B-Thinking  input_dim=2048  dim=512  n_heads=8  tag=xlast_d512_norope  log=logs/trm_2bt_xlast_d512_norope.log
+[GPU 1] Qwen3-VL-2B-Thinking  input_dim=2048  dim=1024  n_heads=16  tag=xlast_d1024_norope  log=logs/trm_2bt_xlast_d1024_norope.log
+[GPU 0] Qwen3-VL-4B-Instruct  input_dim=2560  dim=1024  n_heads=16  tag=xlast_d1024_norope  log=logs/trm_4b_xlast_d1024_norope.log
+[GPU 1] Qwen3-VL-2B-Thinking  input_dim=2048  dim=2048  n_heads=32  tag=xlast_d2048_norope  log=logs/trm_2bt_xlast_d2048_norope.log
+[GPU 0] Qwen3-VL-4B-Instruct  input_dim=2560  dim=2048  n_heads=32  tag=xlast_d2048_norope  log=logs/trm_4b_xlast_d2048_norope.log
+[GPU 1] Grid complete for Qwen3-VL-2B-Thinking: dims = 128 256 512 1024 2048
+[grid] 2B-Thinking finished; launching 4B-Thinking on GPU 1...
+[GPU 1] Qwen3-VL-4B-Thinking  input_dim=2560  dim=128  n_heads=2  tag=xlast_d128_norope  log=logs/trm_4bt_xlast_d128_norope.log
+[GPU 1] Qwen3-VL-4B-Thinking  input_dim=2560  dim=256  n_heads=4  tag=xlast_d256_norope  log=logs/trm_4bt_xlast_d256_norope.log
+[GPU 1] Qwen3-VL-4B-Thinking  input_dim=2560  dim=512  n_heads=8  tag=xlast_d512_norope  log=logs/trm_4bt_xlast_d512_norope.log
+[GPU 1] Qwen3-VL-4B-Thinking  input_dim=2560  dim=1024  n_heads=16  tag=xlast_d1024_norope  log=logs/trm_4bt_xlast_d1024_norope.log
+[GPU 1] Qwen3-VL-4B-Thinking  input_dim=2560  dim=2048  n_heads=32  tag=xlast_d2048_norope  log=logs/trm_4bt_xlast_d2048_norope.log
+[GPU 0] Qwen3-VL-4B-Instruct  input_dim=2560  dim=2560  n_heads=32  tag=xlast_d2560_norope  log=logs/trm_4b_xlast_d2560_norope.log
+[GPU 1] Qwen3-VL-4B-Thinking  input_dim=2560  dim=2560  n_heads=32  tag=xlast_d2560_norope  log=logs/trm_4bt_xlast_d2560_norope.log

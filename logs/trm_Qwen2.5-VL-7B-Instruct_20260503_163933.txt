@@ -203,3 +203,58 @@ TRM Training Log — Qwen2.5-VL-7B-Instruct — 20260503_163933
 [17:54:26]   Stylistic Reasoning: 0.1333
 [17:54:27]   No improvement (14/20)
 [17:54:27] --- Epoch 23/50 ---
+[17:57:49] Epoch 023 | train_loss=1.9681 | train_pred_loss=1.3917 | train_halt_loss=0.5765 | train_acc=0.2624 | val_loss=2.0088 | val_pred_loss=1.4275 | val_halt_loss=0.5814 | val_acc=0.2390
+[17:57:49]   Attribute Reasoning: 0.2683
+[17:57:49]   Other: 0.3333
+[17:57:49]   Positional Reasoning: 0.1544
+[17:57:49]   Quantitative Reasoning: 0.2408
+[17:57:49]   Spatial Reasoning: 0.2727
+[17:57:49]   Stylistic Reasoning: 0.1333
+[17:57:50]   No improvement (15/20)
+[17:57:50] --- Epoch 24/50 ---
+[18:01:12] Epoch 024 | train_loss=1.9770 | train_pred_loss=1.3880 | train_halt_loss=0.5890 | train_acc=0.2766 | val_loss=2.0000 | val_pred_loss=1.4210 | val_halt_loss=0.5791 | val_acc=0.2400
+[18:01:12]   Attribute Reasoning: 0.2683
+[18:01:12]   Other: 0.3333
+[18:01:12]   Positional Reasoning: 0.1618
+[18:01:12]   Quantitative Reasoning: 0.2436
+[18:01:12]   Spatial Reasoning: 0.2684
+[18:01:12]   Stylistic Reasoning: 0.1333
+[18:01:13]   No improvement (16/20)
+[18:01:13] --- Epoch 25/50 ---
+[18:04:35] Epoch 025 | train_loss=1.9706 | train_pred_loss=1.3809 | train_halt_loss=0.5897 | train_acc=0.2796 | val_loss=1.9895 | val_pred_loss=1.4161 | val_halt_loss=0.5735 | val_acc=0.2360
+[18:04:35]   Attribute Reasoning: 0.2683
+[18:04:35]   Other: 0.3241
+[18:04:35]   Positional Reasoning: 0.1691
+[18:04:35]   Quantitative Reasoning: 0.2351
+[18:04:35]   Spatial Reasoning: 0.2641
+[18:04:35]   Stylistic Reasoning: 0.1333
+[18:04:36]   No improvement (17/20)
+[18:04:36] --- Epoch 26/50 ---
+[18:07:58] Epoch 026 | train_loss=1.9804 | train_pred_loss=1.3802 | train_halt_loss=0.6002 | train_acc=0.2880 | val_loss=1.9844 | val_pred_loss=1.4131 | val_halt_loss=0.5712 | val_acc=0.2340
+[18:07:58]   Attribute Reasoning: 0.2683
+[18:07:58]   Other: 0.3056
+[18:07:58]   Positional Reasoning: 0.1691
+[18:07:58]   Quantitative Reasoning: 0.2351
+[18:07:58]   Spatial Reasoning: 0.2641
+[18:07:58]   Stylistic Reasoning: 0.1333
+[18:07:59]   No improvement (18/20)
+[18:07:59] --- Epoch 27/50 ---
+[18:11:21] Epoch 027 | train_loss=1.9663 | train_pred_loss=1.3769 | train_halt_loss=0.5893 | train_acc=0.2792 | val_loss=1.9811 | val_pred_loss=1.4110 | val_halt_loss=0.5701 | val_acc=0.2350
+[18:11:21]   Attribute Reasoning: 0.2805
+[18:11:21]   Other: 0.2870
+[18:11:21]   Positional Reasoning: 0.1691
+[18:11:21]   Quantitative Reasoning: 0.2380
+[18:11:21]   Spatial Reasoning: 0.2684
+[18:11:21]   Stylistic Reasoning: 0.1333
+[18:11:22]   No improvement (19/20)
+[18:11:22] --- Epoch 28/50 ---
+[18:14:44] Epoch 028 | train_loss=1.9693 | train_pred_loss=1.3778 | train_halt_loss=0.5915 | train_acc=0.2868 | val_loss=1.9832 | val_pred_loss=1.4092 | val_halt_loss=0.5740 | val_acc=0.2420
+[18:14:44]   Attribute Reasoning: 0.2805
+[18:14:44]   Other: 0.2870
+[18:14:44]   Positional Reasoning: 0.1912
+[18:14:44]   Quantitative Reasoning: 0.2436
+[18:14:44]   Spatial Reasoning: 0.2771
+[18:14:44]   Stylistic Reasoning: 0.1333
+[18:14:45]   No improvement (20/20)
+[18:14:45] Early stopping at epoch 28 (patience=20)
+[18:14:45] Training complete. Best val acc: 0.2770

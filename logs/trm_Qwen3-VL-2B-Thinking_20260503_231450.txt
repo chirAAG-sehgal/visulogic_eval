@@ -1,0 +1,314 @@
+TRM Training Log — Qwen3-VL-2B-Thinking — 20260503_231450
+================================================================================
+[23:14:50] Config: {'model_name': 'Qwen3-VL-2B-Thinking', 'train_hidden_dir': 'outputs/hidden_states/Qwen3-VL-2B-Thinking', 'val_hidden_dir': 'outputs/hidden_states/val/Qwen3-VL-2B-Thinking', 'train_labels': 'data/visulogic_train/visulogic_train_qwen.jsonl', 'val_labels': 'data/visulogic_benchmark/data.jsonl', 'train_label_key': 'answer', 'val_label_key': 'label', 'dim': 128, 'input_dim': 2048, 'n_heads': 2, 'n_layers': 2, 'mlp_ratio': 2, 'n_classes': 4, 'no_rope': True, 'block_type': 'attn', 'n_latent_steps': 6, 'n_deep_passes': 3, 'n_sup_steps': 16, 'batch_size': 32, 'grad_accum_steps': 2, 'epochs': 50, 'lr': 0.0001, 'lr_embed': 0.01, 'weight_decay': 0.01, 'warmup_ratio': 0.05, 'ema_decay': 0.999, 'patience': 20, 'gpu': 1, 'num_workers': 4, 'seed': 42, 'fp16': False, 'no_fp16': True, 'max_seq_len': None, 'x_last_only': True, 'log_dir': 'logs', 'ckpt_dir': 'checkpoints/trm', 'mlflow_experiment': 'TRM-VisuLogic', 'run_name': None, 'run_tag': 'xlast_d128_norope', 'iter_log_every': 20}
+[23:14:50] TRM parameters: 591,488
+[23:14:50] Train samples: 4296, Val samples: 1000
+[23:14:50] Steps/epoch: 67, Total steps: 3350, Warmup: 167
+[23:14:50] --- Epoch 1/50 ---
+[23:15:34] Epoch 001 | train_loss=2.0089 | train_pred_loss=1.4101 | train_halt_loss=0.5988 | train_acc=0.2579 | val_loss=2.1347 | val_pred_loss=1.4766 | val_halt_loss=0.6581 | val_acc=0.2470
+[23:15:34]   Attribute Reasoning: 0.1585
+[23:15:34]   Other: 0.1759
+[23:15:34]   Positional Reasoning: 0.2426
+[23:15:34]   Quantitative Reasoning: 0.2380
+[23:15:34]   Spatial Reasoning: 0.2814
+[23:15:34]   Stylistic Reasoning: 0.3667
+[23:15:34]   >> New best val acc: 0.2470
+[23:15:34] --- Epoch 2/50 ---
+[23:16:18] Epoch 002 | train_loss=1.9800 | train_pred_loss=1.3894 | train_halt_loss=0.5906 | train_acc=0.2729 | val_loss=2.1070 | val_pred_loss=1.4642 | val_halt_loss=0.6429 | val_acc=0.2390
+[23:16:18]   Attribute Reasoning: 0.1585
+[23:16:18]   Other: 0.1944
+[23:16:18]   Positional Reasoning: 0.2353
+[23:16:18]   Quantitative Reasoning: 0.2295
+[23:16:18]   Spatial Reasoning: 0.2771
+[23:16:18]   Stylistic Reasoning: 0.3111
+[23:16:18]   No improvement (1/20)
+[23:16:18] --- Epoch 3/50 ---
+[23:17:02] Epoch 003 | train_loss=1.9688 | train_pred_loss=1.3911 | train_halt_loss=0.5776 | train_acc=0.2649 | val_loss=2.0764 | val_pred_loss=1.4488 | val_halt_loss=0.6276 | val_acc=0.2440
+[23:17:02]   Attribute Reasoning: 0.1829
+[23:17:02]   Other: 0.1944
+[23:17:02]   Positional Reasoning: 0.2279
+[23:17:02]   Quantitative Reasoning: 0.2550
+[23:17:02]   Spatial Reasoning: 0.2727
+[23:17:02]   Stylistic Reasoning: 0.2667
+[23:17:02]   No improvement (2/20)
+[23:17:02] --- Epoch 4/50 ---
+[23:17:45] Epoch 004 | train_loss=1.9701 | train_pred_loss=1.3885 | train_halt_loss=0.5815 | train_acc=0.2675 | val_loss=2.0463 | val_pred_loss=1.4333 | val_halt_loss=0.6130 | val_acc=0.2460
+[23:17:45]   Attribute Reasoning: 0.2195
+[23:17:45]   Other: 0.2222
+[23:17:45]   Positional Reasoning: 0.2647
+[23:17:45]   Quantitative Reasoning: 0.2465
+[23:17:45]   Spatial Reasoning: 0.2684
+[23:17:45]   Stylistic Reasoning: 0.2111
+[23:17:45]   No improvement (3/20)
+[23:17:45] --- Epoch 5/50 ---
+[23:18:29] Epoch 005 | train_loss=1.9771 | train_pred_loss=1.3879 | train_halt_loss=0.5892 | train_acc=0.2736 | val_loss=2.0236 | val_pred_loss=1.4226 | val_halt_loss=0.6010 | val_acc=0.2560
+[23:18:29]   Attribute Reasoning: 0.2561
+[23:18:29]   Other: 0.1944
+[23:18:29]   Positional Reasoning: 0.2941
+[23:18:29]   Quantitative Reasoning: 0.2606
+[23:18:29]   Spatial Reasoning: 0.2727
+[23:18:29]   Stylistic Reasoning: 0.2111
+[23:18:29]   >> New best val acc: 0.2560
+[23:18:29] --- Epoch 6/50 ---
+[23:19:12] Epoch 006 | train_loss=1.9753 | train_pred_loss=1.3843 | train_halt_loss=0.5910 | train_acc=0.2789 | val_loss=2.0053 | val_pred_loss=1.4130 | val_halt_loss=0.5923 | val_acc=0.2510
+[23:19:12]   Attribute Reasoning: 0.2683
+[23:19:12]   Other: 0.1944
+[23:19:12]   Positional Reasoning: 0.2574
+[23:19:12]   Quantitative Reasoning: 0.2550
+[23:19:12]   Spatial Reasoning: 0.2727
+[23:19:12]   Stylistic Reasoning: 0.2222
+[23:19:12]   No improvement (1/20)
+[23:19:12] --- Epoch 7/50 ---
+[23:19:56] Epoch 007 | train_loss=1.9675 | train_pred_loss=1.3838 | train_halt_loss=0.5836 | train_acc=0.2703 | val_loss=1.9927 | val_pred_loss=1.4073 | val_halt_loss=0.5854 | val_acc=0.2610
+[23:19:56]   Attribute Reasoning: 0.2439
+[23:19:56]   Other: 0.2037
+[23:19:56]   Positional Reasoning: 0.3162
+[23:19:56]   Quantitative Reasoning: 0.2720
+[23:19:56]   Spatial Reasoning: 0.2684
+[23:19:56]   Stylistic Reasoning: 0.2000
+[23:19:56]   >> New best val acc: 0.2610
+[23:19:56] --- Epoch 8/50 ---
+[23:20:40] Epoch 008 | train_loss=1.9716 | train_pred_loss=1.3835 | train_halt_loss=0.5881 | train_acc=0.2747 | val_loss=1.9855 | val_pred_loss=1.4021 | val_halt_loss=0.5834 | val_acc=0.2640
+[23:20:40]   Attribute Reasoning: 0.2317
+[23:20:40]   Other: 0.2037
+[23:20:40]   Positional Reasoning: 0.3235
+[23:20:40]   Quantitative Reasoning: 0.2748
+[23:20:40]   Spatial Reasoning: 0.2684
+[23:20:40]   Stylistic Reasoning: 0.2222
+[23:20:40]   >> New best val acc: 0.2640
+[23:20:40] --- Epoch 9/50 ---
+[23:21:23] Epoch 009 | train_loss=1.9730 | train_pred_loss=1.3823 | train_halt_loss=0.5907 | train_acc=0.2766 | val_loss=1.9746 | val_pred_loss=1.3969 | val_halt_loss=0.5777 | val_acc=0.2620
+[23:21:23]   Attribute Reasoning: 0.2683
+[23:21:23]   Other: 0.2037
+[23:21:23]   Positional Reasoning: 0.3309
+[23:21:23]   Quantitative Reasoning: 0.2578
+[23:21:23]   Spatial Reasoning: 0.2554
+[23:21:23]   Stylistic Reasoning: 0.2556
+[23:21:23]   No improvement (1/20)
+[23:21:23] --- Epoch 10/50 ---
+[23:22:07] Epoch 010 | train_loss=1.9696 | train_pred_loss=1.3791 | train_halt_loss=0.5905 | train_acc=0.2792 | val_loss=1.9683 | val_pred_loss=1.3938 | val_halt_loss=0.5744 | val_acc=0.2600
+[23:22:07]   Attribute Reasoning: 0.2561
+[23:22:07]   Other: 0.1944
+[23:22:07]   Positional Reasoning: 0.3309
+[23:22:07]   Quantitative Reasoning: 0.2635
+[23:22:07]   Spatial Reasoning: 0.2554
+[23:22:07]   Stylistic Reasoning: 0.2333
+[23:22:07]   No improvement (2/20)
+[23:22:07] --- Epoch 11/50 ---
+[23:22:51] Epoch 011 | train_loss=1.9770 | train_pred_loss=1.3771 | train_halt_loss=0.5999 | train_acc=0.2868 | val_loss=1.9637 | val_pred_loss=1.3917 | val_halt_loss=0.5720 | val_acc=0.2550
+[23:22:51]   Attribute Reasoning: 0.2317
+[23:22:51]   Other: 0.2037
+[23:22:51]   Positional Reasoning: 0.3309
+[23:22:51]   Quantitative Reasoning: 0.2635
+[23:22:51]   Spatial Reasoning: 0.2468
+[23:22:51]   Stylistic Reasoning: 0.2111
+[23:22:51]   No improvement (3/20)
+[23:22:51] --- Epoch 12/50 ---
+[23:23:34] Epoch 012 | train_loss=1.9729 | train_pred_loss=1.3736 | train_halt_loss=0.5993 | train_acc=0.2915 | val_loss=1.9618 | val_pred_loss=1.3900 | val_halt_loss=0.5718 | val_acc=0.2520
+[23:23:34]   Attribute Reasoning: 0.2317
+[23:23:34]   Other: 0.1944
+[23:23:34]   Positional Reasoning: 0.3309
+[23:23:34]   Quantitative Reasoning: 0.2550
+[23:23:34]   Spatial Reasoning: 0.2554
+[23:23:34]   Stylistic Reasoning: 0.2000
+[23:23:34]   No improvement (4/20)
+[23:23:34] --- Epoch 13/50 ---
+[23:24:18] Epoch 013 | train_loss=1.9762 | train_pred_loss=1.3725 | train_halt_loss=0.6037 | train_acc=0.2938 | val_loss=1.9628 | val_pred_loss=1.3887 | val_halt_loss=0.5741 | val_acc=0.2600
+[23:24:18]   Attribute Reasoning: 0.2317
+[23:24:18]   Other: 0.2130
+[23:24:18]   Positional Reasoning: 0.3162
+[23:24:18]   Quantitative Reasoning: 0.2550
+[23:24:18]   Spatial Reasoning: 0.2857
+[23:24:18]   Stylistic Reasoning: 0.2111
+[23:24:18]   No improvement (5/20)
+[23:24:18] --- Epoch 14/50 ---
+[23:25:02] Epoch 014 | train_loss=1.9795 | train_pred_loss=1.3729 | train_halt_loss=0.6066 | train_acc=0.2955 | val_loss=1.9624 | val_pred_loss=1.3878 | val_halt_loss=0.5746 | val_acc=0.2750
+[23:25:02]   Attribute Reasoning: 0.2561
+[23:25:02]   Other: 0.2315
+[23:25:02]   Positional Reasoning: 0.3603
+[23:25:02]   Quantitative Reasoning: 0.2550
+[23:25:02]   Spatial Reasoning: 0.2987
+[23:25:02]   Stylistic Reasoning: 0.2333
+[23:25:02]   >> New best val acc: 0.2750
+[23:25:02] --- Epoch 15/50 ---
+[23:25:45] Epoch 015 | train_loss=1.9790 | train_pred_loss=1.3722 | train_halt_loss=0.6068 | train_acc=0.2957 | val_loss=1.9599 | val_pred_loss=1.3871 | val_halt_loss=0.5728 | val_acc=0.2650
+[23:25:45]   Attribute Reasoning: 0.2439
+[23:25:45]   Other: 0.2500
+[23:25:45]   Positional Reasoning: 0.3456
+[23:25:45]   Quantitative Reasoning: 0.2436
+[23:25:45]   Spatial Reasoning: 0.2857
+[23:25:45]   Stylistic Reasoning: 0.2111
+[23:25:45]   No improvement (1/20)
+[23:25:45] --- Epoch 16/50 ---
+[23:26:29] Epoch 016 | train_loss=1.9750 | train_pred_loss=1.3699 | train_halt_loss=0.6051 | train_acc=0.2987 | val_loss=1.9588 | val_pred_loss=1.3864 | val_halt_loss=0.5724 | val_acc=0.2610
+[23:26:29]   Attribute Reasoning: 0.2317
+[23:26:29]   Other: 0.2500
+[23:26:29]   Positional Reasoning: 0.3235
+[23:26:29]   Quantitative Reasoning: 0.2436
+[23:26:29]   Spatial Reasoning: 0.2900
+[23:26:29]   Stylistic Reasoning: 0.2000
+[23:26:29]   No improvement (2/20)
+[23:26:29] --- Epoch 17/50 ---
+[23:27:12] Epoch 017 | train_loss=1.9818 | train_pred_loss=1.3686 | train_halt_loss=0.6133 | train_acc=0.3013 | val_loss=1.9559 | val_pred_loss=1.3859 | val_halt_loss=0.5700 | val_acc=0.2570
+[23:27:12]   Attribute Reasoning: 0.2439
+[23:27:12]   Other: 0.2593
+[23:27:12]   Positional Reasoning: 0.3309
+[23:27:12]   Quantitative Reasoning: 0.2465
+[23:27:12]   Spatial Reasoning: 0.2727
+[23:27:12]   Stylistic Reasoning: 0.1556
+[23:27:12]   No improvement (3/20)
+[23:27:12] --- Epoch 18/50 ---
+[23:27:56] Epoch 018 | train_loss=1.9792 | train_pred_loss=1.3656 | train_halt_loss=0.6136 | train_acc=0.3088 | val_loss=1.9540 | val_pred_loss=1.3856 | val_halt_loss=0.5684 | val_acc=0.2550
+[23:27:56]   Attribute Reasoning: 0.2439
+[23:27:56]   Other: 0.2500
+[23:27:56]   Positional Reasoning: 0.3235
+[23:27:56]   Quantitative Reasoning: 0.2465
+[23:27:56]   Spatial Reasoning: 0.2771
+[23:27:56]   Stylistic Reasoning: 0.1444
+[23:27:56]   No improvement (4/20)
+[23:27:56] --- Epoch 19/50 ---
+[23:28:39] Epoch 019 | train_loss=1.9728 | train_pred_loss=1.3646 | train_halt_loss=0.6082 | train_acc=0.3027 | val_loss=1.9531 | val_pred_loss=1.3855 | val_halt_loss=0.5676 | val_acc=0.2550
+[23:28:39]   Attribute Reasoning: 0.2439
+[23:28:39]   Other: 0.2500
+[23:28:39]   Positional Reasoning: 0.3162
+[23:28:39]   Quantitative Reasoning: 0.2436
+[23:28:39]   Spatial Reasoning: 0.2857
+[23:28:39]   Stylistic Reasoning: 0.1444
+[23:28:39]   No improvement (5/20)
+[23:28:39] --- Epoch 20/50 ---
+[23:29:22] Epoch 020 | train_loss=1.9754 | train_pred_loss=1.3613 | train_halt_loss=0.6141 | train_acc=0.3050 | val_loss=1.9532 | val_pred_loss=1.3855 | val_halt_loss=0.5678 | val_acc=0.2570
+[23:29:22]   Attribute Reasoning: 0.2439
+[23:29:22]   Other: 0.2500
+[23:29:22]   Positional Reasoning: 0.3235
+[23:29:22]   Quantitative Reasoning: 0.2493
+[23:29:22]   Spatial Reasoning: 0.2727
+[23:29:22]   Stylistic Reasoning: 0.1667
+[23:29:23]   No improvement (6/20)
+[23:29:23] --- Epoch 21/50 ---
+[23:30:06] Epoch 021 | train_loss=1.9836 | train_pred_loss=1.3578 | train_halt_loss=0.6258 | train_acc=0.3237 | val_loss=1.9522 | val_pred_loss=1.3856 | val_halt_loss=0.5665 | val_acc=0.2530
+[23:30:06]   Attribute Reasoning: 0.2439
+[23:30:06]   Other: 0.2500
+[23:30:06]   Positional Reasoning: 0.2868
+[23:30:06]   Quantitative Reasoning: 0.2521
+[23:30:06]   Spatial Reasoning: 0.2727
+[23:30:06]   Stylistic Reasoning: 0.1667
+[23:30:06]   No improvement (7/20)
+[23:30:06] --- Epoch 22/50 ---
+[23:30:49] Epoch 022 | train_loss=1.9708 | train_pred_loss=1.3534 | train_halt_loss=0.6174 | train_acc=0.3190 | val_loss=1.9524 | val_pred_loss=1.3859 | val_halt_loss=0.5665 | val_acc=0.2470
+[23:30:49]   Attribute Reasoning: 0.2439
+[23:30:49]   Other: 0.2315
+[23:30:49]   Positional Reasoning: 0.2868
+[23:30:49]   Quantitative Reasoning: 0.2465
+[23:30:49]   Spatial Reasoning: 0.2641
+[23:30:49]   Stylistic Reasoning: 0.1667
+[23:30:49]   No improvement (8/20)
+[23:30:49] --- Epoch 23/50 ---
+[23:31:32] Epoch 023 | train_loss=1.9766 | train_pred_loss=1.3571 | train_halt_loss=0.6195 | train_acc=0.3118 | val_loss=1.9522 | val_pred_loss=1.3864 | val_halt_loss=0.5659 | val_acc=0.2470
+[23:31:32]   Attribute Reasoning: 0.2439
+[23:31:32]   Other: 0.2315
+[23:31:32]   Positional Reasoning: 0.2941
+[23:31:32]   Quantitative Reasoning: 0.2465
+[23:31:32]   Spatial Reasoning: 0.2641
+[23:31:32]   Stylistic Reasoning: 0.1556
+[23:31:32]   No improvement (9/20)
+[23:31:32] --- Epoch 24/50 ---
+[23:32:14] Epoch 024 | train_loss=1.9652 | train_pred_loss=1.3530 | train_halt_loss=0.6122 | train_acc=0.3109 | val_loss=1.9555 | val_pred_loss=1.3870 | val_halt_loss=0.5684 | val_acc=0.2540
+[23:32:14]   Attribute Reasoning: 0.2561
+[23:32:14]   Other: 0.2407
+[23:32:14]   Positional Reasoning: 0.3088
+[23:32:14]   Quantitative Reasoning: 0.2521
+[23:32:14]   Spatial Reasoning: 0.2641
+[23:32:14]   Stylistic Reasoning: 0.1667
+[23:32:14]   No improvement (10/20)
+[23:32:14] --- Epoch 25/50 ---
+[23:32:56] Epoch 025 | train_loss=1.9764 | train_pred_loss=1.3548 | train_halt_loss=0.6216 | train_acc=0.3260 | val_loss=1.9550 | val_pred_loss=1.3874 | val_halt_loss=0.5676 | val_acc=0.2520
+[23:32:56]   Attribute Reasoning: 0.2561
+[23:32:56]   Other: 0.2222
+[23:32:56]   Positional Reasoning: 0.2941
+[23:32:56]   Quantitative Reasoning: 0.2550
+[23:32:56]   Spatial Reasoning: 0.2684
+[23:32:56]   Stylistic Reasoning: 0.1667
+[23:32:56]   No improvement (11/20)
+[23:32:56] --- Epoch 26/50 ---
+[23:33:38] Epoch 026 | train_loss=1.9729 | train_pred_loss=1.3470 | train_halt_loss=0.6258 | train_acc=0.3279 | val_loss=1.9556 | val_pred_loss=1.3879 | val_halt_loss=0.5678 | val_acc=0.2520
+[23:33:38]   Attribute Reasoning: 0.2561
+[23:33:38]   Other: 0.2130
+[23:33:38]   Positional Reasoning: 0.3088
+[23:33:38]   Quantitative Reasoning: 0.2606
+[23:33:38]   Spatial Reasoning: 0.2597
+[23:33:38]   Stylistic Reasoning: 0.1556
+[23:33:38]   No improvement (12/20)
+[23:33:38] --- Epoch 27/50 ---
+[23:34:20] Epoch 027 | train_loss=1.9725 | train_pred_loss=1.3455 | train_halt_loss=0.6270 | train_acc=0.3326 | val_loss=1.9539 | val_pred_loss=1.3886 | val_halt_loss=0.5654 | val_acc=0.2450
+[23:34:20]   Attribute Reasoning: 0.2439
+[23:34:20]   Other: 0.2130
+[23:34:20]   Positional Reasoning: 0.2941
+[23:34:20]   Quantitative Reasoning: 0.2521
+[23:34:20]   Spatial Reasoning: 0.2554
+[23:34:20]   Stylistic Reasoning: 0.1556
+[23:34:20]   No improvement (13/20)
+[23:34:20] --- Epoch 28/50 ---
+[23:35:02] Epoch 028 | train_loss=1.9687 | train_pred_loss=1.3426 | train_halt_loss=0.6261 | train_acc=0.3265 | val_loss=1.9517 | val_pred_loss=1.3895 | val_halt_loss=0.5622 | val_acc=0.2380
+[23:35:02]   Attribute Reasoning: 0.2439
+[23:35:02]   Other: 0.2130
+[23:35:02]   Positional Reasoning: 0.2721
+[23:35:02]   Quantitative Reasoning: 0.2465
+[23:35:02]   Spatial Reasoning: 0.2468
+[23:35:02]   Stylistic Reasoning: 0.1556
+[23:35:02]   No improvement (14/20)
+[23:35:02] --- Epoch 29/50 ---
+[23:35:44] Epoch 029 | train_loss=1.9669 | train_pred_loss=1.3352 | train_halt_loss=0.6317 | train_acc=0.3454 | val_loss=1.9510 | val_pred_loss=1.3906 | val_halt_loss=0.5603 | val_acc=0.2340
+[23:35:44]   Attribute Reasoning: 0.2561
+[23:35:44]   Other: 0.2130
+[23:35:44]   Positional Reasoning: 0.2794
+[23:35:44]   Quantitative Reasoning: 0.2380
+[23:35:44]   Spatial Reasoning: 0.2338
+[23:35:44]   Stylistic Reasoning: 0.1556
+[23:35:44]   No improvement (15/20)
+[23:35:44] --- Epoch 30/50 ---
+[23:36:26] Epoch 030 | train_loss=1.9675 | train_pred_loss=1.3322 | train_halt_loss=0.6352 | train_acc=0.3489 | val_loss=1.9519 | val_pred_loss=1.3918 | val_halt_loss=0.5601 | val_acc=0.2360
+[23:36:26]   Attribute Reasoning: 0.2561
+[23:36:26]   Other: 0.2130
+[23:36:26]   Positional Reasoning: 0.2647
+[23:36:26]   Quantitative Reasoning: 0.2380
+[23:36:26]   Spatial Reasoning: 0.2424
+[23:36:26]   Stylistic Reasoning: 0.1778
+[23:36:26]   No improvement (16/20)
+[23:36:26] --- Epoch 31/50 ---
+[23:37:09] Epoch 031 | train_loss=1.9573 | train_pred_loss=1.3261 | train_halt_loss=0.6312 | train_acc=0.3400 | val_loss=1.9537 | val_pred_loss=1.3931 | val_halt_loss=0.5606 | val_acc=0.2390
+[23:37:09]   Attribute Reasoning: 0.2561
+[23:37:09]   Other: 0.2130
+[23:37:09]   Positional Reasoning: 0.2721
+[23:37:09]   Quantitative Reasoning: 0.2380
+[23:37:09]   Spatial Reasoning: 0.2511
+[23:37:09]   Stylistic Reasoning: 0.1778
+[23:37:09]   No improvement (17/20)
+[23:37:09] --- Epoch 32/50 ---
+[23:37:50] Epoch 032 | train_loss=1.9582 | train_pred_loss=1.3262 | train_halt_loss=0.6320 | train_acc=0.3447 | val_loss=1.9546 | val_pred_loss=1.3946 | val_halt_loss=0.5599 | val_acc=0.2360
+[23:37:50]   Attribute Reasoning: 0.2561
+[23:37:50]   Other: 0.2130
+[23:37:50]   Positional Reasoning: 0.2574
+[23:37:50]   Quantitative Reasoning: 0.2380
+[23:37:50]   Spatial Reasoning: 0.2468
+[23:37:50]   Stylistic Reasoning: 0.1778
+[23:37:51]   No improvement (18/20)
+[23:37:51] --- Epoch 33/50 ---
+[23:38:33] Epoch 033 | train_loss=1.9526 | train_pred_loss=1.3130 | train_halt_loss=0.6397 | train_acc=0.3563 | val_loss=1.9566 | val_pred_loss=1.3963 | val_halt_loss=0.5603 | val_acc=0.2330
+[23:38:33]   Attribute Reasoning: 0.2683
+[23:38:33]   Other: 0.2037
+[23:38:33]   Positional Reasoning: 0.2500
+[23:38:33]   Quantitative Reasoning: 0.2436
+[23:38:33]   Spatial Reasoning: 0.2294
+[23:38:33]   Stylistic Reasoning: 0.1778
+[23:38:33]   No improvement (19/20)
+[23:38:33] --- Epoch 34/50 ---
+[23:39:15] Epoch 034 | train_loss=1.9473 | train_pred_loss=1.3155 | train_halt_loss=0.6318 | train_acc=0.3561 | val_loss=1.9587 | val_pred_loss=1.3981 | val_halt_loss=0.5606 | val_acc=0.2340
+[23:39:15]   Attribute Reasoning: 0.2561
+[23:39:15]   Other: 0.2037
+[23:39:15]   Positional Reasoning: 0.2647
+[23:39:15]   Quantitative Reasoning: 0.2436
+[23:39:15]   Spatial Reasoning: 0.2294
+[23:39:15]   Stylistic Reasoning: 0.1778
+[23:39:15]   No improvement (20/20)
+[23:39:15] Early stopping at epoch 34 (patience=20)
+[23:39:15] Training complete. Best val acc: 0.2750

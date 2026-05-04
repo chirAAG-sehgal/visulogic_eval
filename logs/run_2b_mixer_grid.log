@@ -1,0 +1,3 @@
+[GPU 0] Qwen3-VL-2B-Instruct  input_dim=2048  dim=128  n_heads=2  block=mixer  tag=xlast_d128_mixer  log=logs/trm_2b_xlast_d128_mixer.log
+[GPU 0] Qwen3-VL-2B-Instruct  input_dim=2048  dim=256  n_heads=4  block=mixer  tag=xlast_d256_mixer  log=logs/trm_2b_xlast_d256_mixer.log
+[GPU 0] Qwen3-VL-2B-Instruct  input_dim=2048  dim=512  n_heads=8  block=mixer  tag=xlast_d512_mixer  log=logs/trm_2b_xlast_d512_mixer.log
